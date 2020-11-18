@@ -4,7 +4,8 @@ from src.classes.json_encoder import JsonEncoder
 
 class Passport(JsonEncoder):
     type = ''
-    number = ""
+    number = ''
+    birthplace = ''
     serialNumber = ''
     issuedDate = ''
     issuingAuthority = ''

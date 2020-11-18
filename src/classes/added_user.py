@@ -8,6 +8,7 @@ class UserPost(JsonEncoder):
     gender = ''
     birthdate = ''
     phone = ''
+    email = ''
 
     # SNILS, INN, PASSPORT (внутри PASSPORT registrationAddress)
     personalDocuments = []

@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 
@@ -21,8 +22,11 @@ def get_client_user_id(token, client_id, data_for_creating_user):
     s = create_user_response.text
     d = json.loads(s)
     current_user = d.get('currentUser')
-    client_user_id = current_user.get('id')
-    return client_user_id
+    try:
+        client_user_id = current_user.get('id')
+        return client_user_id
+    except:
+        print('наверно есть такой юзер')
 
 
 def create_employee(token, client_id, data_for_creating_employee):
@@ -36,3 +40,12 @@ def create_employee(token, client_id, data_for_creating_employee):
     created_employee = d.get('employee')
     created_employee_id = created_employee.get('id')
     return created_employee_id
+
+
+def prepare_data_for_employee(client_user_id):
+    data = {"clientUserId": client_user_id,
+            "legalEntityId": "e22411b3-75db-45ef-a37c-5a5225f21746",
+            "departmentId": "",
+            "positionId": "",
+            "roleIds": []}
+    return data
