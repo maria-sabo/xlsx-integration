@@ -1,7 +1,7 @@
 from src.classes.json_encoder import JsonEncoder
 
 
-class UserPost(JsonEncoder):
+class User(JsonEncoder):
     lastName = ''
     firstName = ''
     patronymic = ''
