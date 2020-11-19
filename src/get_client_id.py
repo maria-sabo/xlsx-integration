@@ -1,5 +1,4 @@
 import json
-
 import requests
 
 
@@ -39,6 +38,7 @@ def create_employee(token, client_id, data_for_creating_employee):
     if response_dict.get('result') == True:
         created_employee = response_dict.get('employee')
         created_employee_id = created_employee.get('id')
+        print('сотрудник создан ура')
         return created_employee_id
     else:
         print('что то не так')
@@ -51,3 +51,12 @@ def prepare_data_for_employee(client_user_id):
             "positionId": "",
             "roleIds": []}
     return data
+
+
+def create_employee_full(token, data_for_creating_user):
+    client_id = get_client_id_by_token(token)
+
+    client_user_id = get_client_user_id(token, client_id, data_for_creating_user)
+
+    data_for_employee = prepare_data_for_employee(client_user_id)
+    create_employee(token, client_id, data_for_employee)

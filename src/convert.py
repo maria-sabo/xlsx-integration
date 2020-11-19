@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy
+import json
 
 from src.classes.added_user import User
 from src.classes.address import Address
 from src.classes.doc import Doc
 from src.classes.employee import Employee
 from src.classes.passport import Passport
+from src.get_client_id import create_employee_full
 
 
 def data2class(i, row, all_users_excel_for_post):
@@ -63,7 +65,11 @@ def excel2class():
 
     all_users_excel_for_post = []
     info_about_user_work = []
-
+    token = '1e542e4b-ee46-4982-a2de-727450f2046d'
     for i, row in df.iterrows():
         data2class(i, row, all_users_excel_for_post)
+        print('creating employee #: ' + str(i))
+        print('---')
+        data = json.loads(all_users_excel_for_post[i].toJSON())
+        create_employee_full(token, data)
     return all_users_excel_for_post
