@@ -7,6 +7,7 @@ import json
 from src.classes.added_user import User
 from src.classes.address import Address
 from src.classes.doc import Doc
+from src.classes.employee import Employee
 from src.classes.passport import Passport
 
 
@@ -48,17 +49,17 @@ def data2class(row, file_name):
             user.personalDocuments.append(Doc('SNILS', row['СНИЛС']))
             user.personalDocuments.append(Doc('INN', row['ИНН ФЛ']))
 
-            # employee = Employee(row['Юрлицо'], row['Руководитель'], row['Кадровый сотрудник'])
-            # employee.department = row['Отдел']
-            # employee.position = row['Должность']
-            # info_about_user_work.insert(i, employee)
-            return user, snils
+            employee = Employee(row['Юрлицо'], row['Руководитель'], row['Кадровый сотрудник'])
+            employee.department = row['Отдел']
+            employee.position = row['Должность']
+
+            return user, snils, employee
     f.close()
-    return False, False
+    return False, False, False
 
 
-def xlsx2df(file_name):
-    df = pd.read_excel(file_name, sheet_name=0)
+def xlsx2df(excel_name):
+    df = pd.read_excel(excel_name, sheet_name=0)
 
     df.drop([0, 1], inplace=True)
     df.drop(df.columns[0], axis=1, inplace=True)
