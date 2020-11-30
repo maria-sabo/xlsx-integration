@@ -1,34 +1,38 @@
-import os
-
 import pandas as pd
 import numpy
 
-from src.classes.added_user import User
+from src.classes.user import User
 from src.classes.address import Address
 from src.classes.doc import Doc
 from src.classes.employee import Employee
 from src.classes.passport import Passport
+from src.data_validate import gender_validate, date_validate, phone_validate, authority_code_validate, \
+    postal_code_validate, snils_validate
+
+
+def get_snils(row):
+    return row['СНИЛС']
 
 
 def data2class(row):
-    snils = row['СНИЛС']
     user = User(row['Фамилия'])
     user.firstName = row['Имя']
     user.patronymic = row['Отчество']
-    user.gender = row['Пол']
-    user.birthdate = row['Дата рождения']
-    user.phone = row['Номер телефона']
+
+    user.gender = gender_validate(row['Пол'])
+    user.birthdate = date_validate(row['Дата рождения'])
+    user.phone = phone_validate(row['Номер телефона'])
     user.email = row['Электронная почта']
 
     user.personalDocuments = []
     passport = Passport('PASSPORT', row['Паспорт:Номер'], row['Паспорт:Серия'])
-    passport.issuedDate = row['Паспорт:Дата выдачи']
+    passport.issuedDate = date_validate(row['Паспорт:Дата выдачи'])
     passport.issuingAuthority = row['Паспорт:Кем выдан']
-    passport.issuingAuthorityCode = row['Паспорт:Код подразделения']
+    passport.issuingAuthorityCode = authority_code_validate(row['Паспорт:Код подразделения'])
     passport.birthplace = row['Паспорт:Место рождения']
 
     address = Address()
-    address.postalCode = row['Адрес регистрации:Почтовый индекс']
+    address.postalCode = postal_code_validate(row['Адрес регистрации:Почтовый индекс'])
     address.regionCode = row['Адрес регистрации:Регион']
     address.city = row['Адрес регистрации:Город']
     address.street = row['Адрес регистрации:Улица']
@@ -45,7 +49,7 @@ def data2class(row):
     employee.department = row['Отдел']
     employee.position = row['Должность']
 
-    return user, snils, employee
+    return user, employee
 
 
 def xlsx2df(excel_name):

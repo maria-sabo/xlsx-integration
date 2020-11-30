@@ -1,8 +1,10 @@
 import json
+import math
 import sys
 
 import requests
-from src.convert import xlsx2df, data2class
+from src.convert import xlsx2df, data2class, get_snils
+from src.data_validate import date_validate, phone_validate, email_validate
 from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils
 
 
@@ -12,7 +14,6 @@ def main():
 
     excel_name = sys.argv[1]
     token = sys.argv[2]
-
     client_id = get_client_id_by_token(token)
 
     if client_id:
@@ -23,9 +24,12 @@ def main():
 
         if legal_entity_dict:
             for i, row in df.iterrows():
-                user, snils, employee = data2class(row)
-                snils = snils.replace(' ', '').replace('-', '')
+                snils = get_snils(row)
+                if snils:
+                    snils = snils.replace(' ', '').replace('-', '')
+
                 if not (snils in lst_person_snils):
+                    user, employee = data2class(row)
                     legal_entity_excel = employee.legalEntity
                     position_excel = employee.position
                     department_excel = employee.department

@@ -92,10 +92,10 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
                     id_ = id_name
                     name_ = name
             if flag:
-                print('Юрлицо: ' + excel_legal_entity + ' есть у нас в сервисе')
+                print('Юрлицо: "' + excel_legal_entity + '" есть у нас в сервисе')
                 legal_entity_dict[id_] = name_
             else:
-                print('Юрлица: ' + str(excel_legal_entity) + ' нет у нас в сервисе, мы не выгрузим сотрудников')
+                print('Юрлица: "' + str(excel_legal_entity) + '" нет у нас в сервисе, мы не выгрузим сотрудников.')
                 return False
     else:
         print('Ошибка получения списка юрлиц в сервисе. ' + response_dict.get('errorMessage'))
