@@ -13,12 +13,12 @@ def get_client_id_by_token(token):
         client_id = clients_of_current_user[0].get('id')
         return client_id
     else:
-        print('наверно некорректный токен')
+        print('Ошибка. Вероятно, передан некорректный токен.')
     return False
 
 
 # создаем пользователя клиента (person), возвращается его clientUserId
-def create_client_user(token, client_id, data_for_creating_user, file_name, snils):
+def create_client_user(token, client_id, data_for_creating_user):
     create_user_response = requests.post('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/users',
                                          headers={'User-Api-Token': token},
                                          json=data_for_creating_user)
@@ -26,13 +26,10 @@ def create_client_user(token, client_id, data_for_creating_user, file_name, snil
     if response_dict.get('result'):
         current_user = response_dict.get('clientUser')
         client_user_id = current_user.get('id')
-        print('добавлен пользователь клиента')
-        with open(file_name, 'a') as f:
-            f.write(snils + '\n')
-        f.close()
+        print('Добавлен пользователь клиента.')
         return client_user_id
     else:
-        print('наверно есть такой пользователь клиента: ' + response_dict.get('errorMessage'))
+        print('Ошибка. Вероятно, уже существует такой пользователь клиента. ' + response_dict.get('errorMessage'))
         return False
 
 
@@ -47,39 +44,33 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
     if response_dict.get('result'):
         created_employee = response_dict.get('employee')
         created_employee_id = created_employee.get('id')
-        print('сотрудник создан ура')
+        print('Сотрудник создан.')
         return created_employee_id
     else:
-        print('сотрудник не создан')
+        print('Сотрудник не создан.')
 
 
-# def data_for_employee(client_user_id, legal_entity_id):
-#     data = {"clientUserId": client_user_id,
-#             "legalEntityId": legal_entity_id,
-#             "departmentId": "",
-#             "positionId": "",
-#             "roleIds": []}
-#     return data
+# список всех снилсов в сервисе
+def lst_snils(token, client_id):
+    snils_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+                                  headers={'User-Api-Token': token})
+    response_dict = json.loads(snils_response.text)
+    lst_person_snils = []
+
+    if response_dict.get('result'):
+        lst_employees = response_dict.get('employees')
+        for employee in lst_employees:
+            personal_documents = employee.get('personalDocuments')
+            for personal_document in personal_documents:
+                if personal_document['type'] == "SNILS":
+                    lst_person_snils.append(personal_document['number'])
+        return lst_person_snils
+    else:
+        print('Ошибка. Не удалось получить сотрудников и их СНИЛСы. ' + response_dict.get('errorMessage'))
+        return False
 
 
-# def search_legal_entity(token, client_id, legal_entity_excel):
-#     legal_entity_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
-#                                          headers={'User-Api-Token': token})
-#     response_dict = json.loads(legal_entity_response.text)
-#     if response_dict.get('result'):
-#         lst_legal_entities = response_dict.get('legalEntities')
-#         for legal_entity in lst_legal_entities:
-#             if (legal_entity.get('name') == legal_entity_excel) or (
-#                     legal_entity.get('shortName') == legal_entity_excel):
-#                 legal_entity_id = legal_entity.get('id')
-#                 return legal_entity_id
-#         print('такого юрлица нет, сотрудник будет создан в юрлице "Юрлицо')
-#         return "e22411b3-75db-45ef-a37c-5a5225f21746"
-#     else:
-#         print('ошибка...' + response_dict.get('errorMessage'))
-#         return False
-
-
+# все ли юрлица из excel уже есть в сервисе
 def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     legal_entity_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
                                          headers={'User-Api-Token': token})
@@ -101,14 +92,13 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
                     id_ = id_name
                     name_ = name
             if flag:
-                print('ок, юрлицо: ' + excel_legal_entity + ' есть у нас в сервисе')
+                print('Юрлицо: ' + excel_legal_entity + ' есть у нас в сервисе')
                 legal_entity_dict[id_] = name_
-                print(legal_entity_dict)
             else:
-                print('кошмар, юрлица: ' + str(excel_legal_entity) + ' нет у нас в сервисе, мы не выгрузим сотрудников')
+                print('Юрлица: ' + str(excel_legal_entity) + ' нет у нас в сервисе, мы не выгрузим сотрудников')
                 return False
     else:
-        print('ошибка...' + response_dict.get('errorMessage'))
+        print('Ошибка получения списка юрлиц в сервисе. ' + response_dict.get('errorMessage'))
         return False
     return legal_entity_dict
 
@@ -121,16 +111,15 @@ def create_position(token, client_id, position_excel):
         'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
         headers={'User-Api-Token': token},
         json=data_for_creating_position)
-    # response = create_employee_response.text
     response_dict = json.loads(create_position_response.text)
 
     if response_dict.get('result'):
         created_position = response_dict.get('employeePosition')
         created_position_id = created_position.get('id')
-        print('должность добавлена')
+        print('Новая должность добавлена.')
         return created_position_id
     else:
-        print('должность не добавлена :(')
+        print('Должность не добавлена. Произошла ошибка: ' + response_dict.get('errorMessage'))
 
 
 def get_position(token, client_id, position_excel):
@@ -148,7 +137,7 @@ def get_position(token, client_id, position_excel):
         position_id = create_position(token, client_id, position_excel)
         return position_id
     else:
-        print('ошибка...' + response_dict.get('errorMessage'))
+        print('Ошибка: ' + response_dict.get('errorMessage'))
         return False
 
 
@@ -164,7 +153,7 @@ def get_root_department(token, client_id):
                 root_department_id = department.get('id')
                 return root_department_id
     else:
-        print('ошибка...' + response_dict.get('errorMessage'))
+        print('Ошибка: ' + response_dict.get('errorMessage'))
         return False
 
 
@@ -183,10 +172,10 @@ def create_department(token, client_id, department_excel):
     if response_dict.get('result'):
         created_department = response_dict.get('clientDepartment')
         created_department_id = created_department.get('id')
-        print('отдел добавлен')
+        print('Новый отдел добавлен.')
         return created_department_id
     else:
-        print('отдел не добавлен :(')
+        print('Отдел не добавлен. Произошла ошибка: ' + response_dict.get('errorMessage'))
 
 
 def get_department(token, client_id, department_excel):
@@ -204,7 +193,7 @@ def get_department(token, client_id, department_excel):
         department_id = create_department(token, client_id, department_excel)
         return department_id
     else:
-        print('ошибка...' + response_dict.get('errorMessage'))
+        print('Ошибка: ' + response_dict.get('errorMessage'))
         return False
 
 
@@ -225,10 +214,10 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     return data
 
 
-def create_employee_full(token, client_id, data_for_creating_user, file_name, snils, legal_entity_excel,
+def create_employee_full(token, client_id, data_for_creating_user, legal_entity_excel,
                          legal_entity_dict, position_excel, department_excel):
     try:
-        client_user_id = create_client_user(token, client_id, data_for_creating_user, file_name, snils)
+        client_user_id = create_client_user(token, client_id, data_for_creating_user)
         if client_user_id:
             data = prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict, legal_entity_excel,
                                              position_excel, department_excel)
@@ -237,4 +226,4 @@ def create_employee_full(token, client_id, data_for_creating_user, file_name, sn
         else:
             print('...')
     except:
-        print('что то случилось')
+        print('Произошла ошибка при добавлении сотрудника.')

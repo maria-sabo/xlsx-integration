@@ -1,44 +1,46 @@
 import json
+import sys
 
 import requests
 from src.convert import xlsx2df, data2class
-from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, get_root_department, \
-    create_department, get_position, get_department
+from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils
 
 
 def main():
     r = requests.get('https://app-test1.hr-link.ru/api/v1/version')
     print('Welcome: ' + r.text + '\n')
 
-    file_name = 'user_snils.txt'
-    token = '275a7c54-e874-4e86-8006-ce18fa3d22ca'
+    excel_name = sys.argv[1]
+    token = sys.argv[2]
 
-    # получаем id клиента
     client_id = get_client_id_by_token(token)
+
     if client_id:
-        df = xlsx2df(excel_name='test3.xlsx')
+        df = xlsx2df(excel_name)
         excel_column_legal_entity = df['Юрлицо'].values
         legal_entity_dict = check_legal_entities_excel(token, client_id, excel_column_legal_entity)
-        print(get_root_department(token, client_id))
-        print(get_department(token, client_id, 'dkdkd'))
+        lst_person_snils = lst_snils(token, client_id)
 
         if legal_entity_dict:
             for i, row in df.iterrows():
-                user, snils, employee = data2class(row, file_name)
-                legal_entity_excel = ''
-                position_excel = ''
-                department_excel = ''
-                if employee:
+                user, snils, employee = data2class(row)
+                snils = snils.replace(' ', '').replace('-', '')
+                if not (snils in lst_person_snils):
                     legal_entity_excel = employee.legalEntity
                     position_excel = employee.position
                     department_excel = employee.department
-                if user:
+
                     data_client_user = json.loads(user.toJSON())
                     print('creating employee #: ' + str(i))
-                    create_employee_full(token, client_id, data_client_user, file_name, snils,
-                                         legal_entity_excel, legal_entity_dict, position_excel, department_excel)
+
+                    create_employee_full(token, client_id, data_client_user, legal_entity_excel, legal_entity_dict,
+                                         position_excel, department_excel)
+
+                    lst_person_snils.append(snils)
+                else:
+                    print('Пользователь с таким снилсом уже существует в сервисе.')
     else:
-        print('клиент не найден')
+        print('Клиент не найден.')
 
 
 if __name__ == main():
