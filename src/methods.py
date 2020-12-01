@@ -29,7 +29,7 @@ def create_client_user(token, client_id, data_for_creating_user):
         print('Добавлен пользователь клиента.')
         return client_user_id
     else:
-        print('Ошибка. Вероятно, уже существует такой пользователь клиента. ' + response_dict.get('errorMessage'))
+        print('Ошибка.' + response_dict.get('errorMessage'))
         return False
 
 
@@ -82,7 +82,7 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
 
         for legal_entity in lst_legal_entities:
             legal_entity_name_dict[legal_entity.get('id')] = legal_entity.get('name')
-
+        print('Проверка нахождения переданных юрлиц в нашем сервисе: \n')
         for excel_legal_entity in excel_column_legal_entity:
             flag = False
             id_, name_ = '', ''
@@ -97,6 +97,7 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
             else:
                 print('Юрлица: "' + str(excel_legal_entity) + '" нет у нас в сервисе, мы не выгрузим сотрудников.')
                 return False
+        print('\n')
     else:
         print('Ошибка получения списка юрлиц в сервисе. ' + response_dict.get('errorMessage'))
         return False

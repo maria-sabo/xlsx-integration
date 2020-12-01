@@ -4,7 +4,6 @@ import json
 import sys
 import requests
 from src.convert import xlsx2df, data2class, get_snils
-from src.data_validate import is_inn_correct
 from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils
 
 
@@ -15,8 +14,6 @@ def main():
     if sys.argv.__len__() == 3:
         excel_name = sys.argv[1]
         token = sys.argv[2]
-        # print(is_correct_snils('193-045-68581'))
-        #print(is_inn_correct('960365629321'))
 
         client_id = get_client_id_by_token(token)
 
@@ -28,6 +25,7 @@ def main():
 
             if legal_entity_dict:
                 for i, row in df.iterrows():
+                    print('creating employee #: ' + str(i))
                     snils = get_snils(row)
                     if snils:
                         snils = snils.replace(' ', '').replace('-', '')
@@ -40,15 +38,14 @@ def main():
                             department_excel = employee.department
 
                             data_client_user = json.loads(user.toJSON())
-                            print('creating employee #: ' + str(i))
 
                             create_employee_full(token, client_id, data_client_user, legal_entity_excel,
                                                  legal_entity_dict,
                                                  position_excel, department_excel)
 
                             lst_person_snils.append(snils)
-                        else:
-                            print('Некорректный СНИЛС, ИНН или паспорт.')
+                        # else:
+                        # print('Некорректный СНИЛС, ИНН или паспорт.')
                     else:
                         print('Пользователь с таким снилсом уже существует в сервисе.')
         else:

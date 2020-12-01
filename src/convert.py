@@ -72,5 +72,4 @@ def xlsx2df(excel_name):
 
     df = df.astype(str)
     df.replace('nan', numpy.nan, inplace=True)
-    print(df)
     return df

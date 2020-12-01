@@ -1,5 +1,4 @@
 import simplejson
-import json
 
 
 class JsonEncoder:

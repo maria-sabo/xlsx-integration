@@ -94,20 +94,20 @@ def snils_validate(snils):
 
 
 def is_inn_correct(inn):
-    sum = 0
+    control_sum_first = 0
     arr = [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
-    for i in range(10):
-        sum += arr[i] * int(inn[i])
-    sum = sum % 11
-    sum = sum % 10
+    for i in range(len(arr)):
+        control_sum_first += arr[i] * int(inn[i])
+    control_sum_first = control_sum_first % 11
+    control_sum_first = control_sum_first % 10
 
-    sum2 = 0
+    control_sum_second = 0
     arr2 = [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
-    for i in range(11):
-        sum2 += arr2[i] * int(inn[i])
-    sum2 = sum2 % 11
-    sum2 = sum2 % 10
-    return (inn[10] == str(sum)) and (inn[11] == str(sum2))
+    for i in range(len(arr2)):
+        control_sum_second += arr2[i] * int(inn[i])
+    control_sum_second = control_sum_second % 11
+    control_sum_second = control_sum_second % 10
+    return (inn[10] == str(control_sum_first)) and (inn[11] == str(control_sum_second))
 
 
 def inn_validate(inn):
