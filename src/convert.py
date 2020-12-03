@@ -8,7 +8,7 @@ from src.classes.employee import Employee
 from src.classes.passport import Passport
 from src.data_validate import gender_validate, date_validate, phone_validate, authority_code_validate, \
     postal_code_validate, snils_validate, email_validate, region_code_validate, number_validate, serial_number_validate, \
-    inn_validate, not_null_name_validate, hr_manager_validate, head_manager_validate
+    inn_validate, not_null_name_validate, hr_manager_validate, head_manager_validate, external_id_validate
 
 
 # получение значения, прошедшего валидацию, из ячейки СНИЛС
@@ -30,6 +30,13 @@ def data2class(row):
     head_manager = head_manager_validate(row['Руководитель'])
     hr_manager = hr_manager_validate(row['Кадровый сотрудник'])
 
+    phone = phone_validate(row['Номер телефона'])
+    email = email_validate(row['Электронная почта'])
+
+    # добавить проверку (phone, login)
+    # flag_new_email, flag_new_phone = is_email_phone_new(token, cli)
+    # is_phone_new =
+
     if (passport_number and passport_serial_number and snils and inn) and (first_name and last_name) and (
             head_manager is not None) and (hr_manager is not None):
         user = User(last_name, first_name)
@@ -37,8 +44,8 @@ def data2class(row):
 
         user.gender = gender_validate(row['Пол'])
         user.birthdate = date_validate(row['Дата рождения'])
-        user.phone = phone_validate(row['Номер телефона'])
-        user.email = email_validate(row['Электронная почта'])
+        user.phone = phone
+        user.email = email
 
         user.personalDocuments = []
         passport = Passport('PASSPORT', passport_number, passport_serial_number)
@@ -64,11 +71,24 @@ def data2class(row):
         employee = Employee(row['Юрлицо'], head_manager, hr_manager)
         employee.department = row['Отдел']
         employee.position = row['Должность']
-        employee.externalId = row['ID сотрудника во внешней системе']
+        employee.externalId = external_id_validate(row['ID сотрудника во внешней системе'])
 
         return user, employee
     else:
         return False, False
+
+# def is_correct(user, employee, token, client_id):
+#     snils =  user.snils
+#     phone = user.phone
+#     email = user.email
+#
+#     email_phone_lst = []
+#
+#
+#     if not snils:
+#         print('Необходимо ввести СНИЛС.')
+#         return False
+
 
 
 # excel таблица переводится в df

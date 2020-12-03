@@ -226,3 +226,9 @@ def hr_manager_validate(hr_manager_flag):
         else:
             print('Некорректно введен флаг роли сотрудника. Сотрудник не будет загружен.')
             return None
+
+
+def external_id_validate(external_id):
+    if type(external_id) is float and numpy.isnan(external_id):
+        # print('В данные сотрудника не будет записан external_id.')
+        return None

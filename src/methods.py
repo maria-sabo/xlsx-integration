@@ -2,7 +2,6 @@ import json
 import numpy
 import requests
 
-
 # получаем id текущего клиента с помощью токена
 from src.classes.employee_post import EmployeePost
 
@@ -261,6 +260,29 @@ def get_role_ids(token, head_manager_excel, hr_manager_excel, employee_roles_dic
     return role_ids
 
 
+def check_external_id(token, client_id, external_id):
+    employee_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+                                     headers={'User-Api-Token': token})
+    response_dict = json.loads(employee_response.text)
+    lst_external_id = []
+
+    if response_dict.get('result'):
+        lst_employees = response_dict.get('employees')
+        for employee in lst_employees:
+            legal_entity = employee.get('legalEntities')
+            for le in legal_entity:
+                lst_external_id.append(le.get('externalId'))
+        lst_external_id = list(filter(None, lst_external_id))
+        if external_id in lst_external_id:
+            print('Ошибка. external_id уже записан в систему. Невозможно создать сотрудника с таким external_id.')
+            return False
+        else:
+            return True
+    else:
+        print('Ошибка.' + response_dict.get('errorMessage'))
+    return False
+
+
 # готовим данные для создания employee
 # data =      {"clientUserId": client_user_id,
 #             "legalEntityId": legal_entity_id,
@@ -277,7 +299,6 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     position_id = get_position(token, client_id, position_excel)
     department_id = get_department(token, client_id, department_excel, root_department_id)
     role_ids = get_role_ids(token, head_manager_excel, hr_manager_excel, employee_roles_dict)
-
 
     # data = {"clientUserId": client_user_id,
     #         "legalEntityId": legal_entity_id,
@@ -328,16 +349,19 @@ def create_employee_full(token, client_id, data_for_creating_user, legal_entity_
     hr_manager_excel = employee.hrManager
 
     external_id = employee.externalId
-    try:
-        client_user_id = create_client_user(token, client_id, data_for_creating_user)
-        if client_user_id:
+    if check_external_id(token, client_id, external_id):
+        try:
+            client_user_id = create_client_user(token, client_id, data_for_creating_user)
+            if client_user_id:
 
-            data = prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict, legal_entity_excel,
-                                             position_excel, department_excel, root_department_id, head_manager_excel,
-                                             hr_manager_excel, employee_roles_dict, external_id)
-            create_employee_from_client_user(token, client_id, data)
-            print('!!!')
-        else:
-            print('...')
-    except:
-        print('Произошла ошибка при добавлении сотрудника.')
+                data = prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict,
+                                                 legal_entity_excel,
+                                                 position_excel, department_excel, root_department_id,
+                                                 head_manager_excel,
+                                                 hr_manager_excel, employee_roles_dict, external_id)
+                create_employee_from_client_user(token, client_id, data)
+                print('!!!')
+            else:
+                print('...')
+        except:
+            print('Произошла ошибка при добавлении сотрудника.')
