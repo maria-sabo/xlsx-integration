@@ -4,6 +4,7 @@ import requests
 
 
 # получаем id текущего клиента с помощью токена
+from src.classes.employee_post import EmployeePost
 
 
 def get_client_id_by_token(token):
@@ -245,7 +246,6 @@ def get_employee_roles_dict(token):
 # возвращает список ролей для создания сотрудника
 def get_role_ids(token, head_manager_excel, hr_manager_excel, employee_roles_dict):
     role_ids = []
-    # employee_roles_dict = get_employee_roles_dict(token)
     for employee_role_id, employee_role_name in employee_roles_dict.items():
         if employee_role_name == 'Руководитель':
             head_manager_id = employee_role_id
@@ -269,7 +269,7 @@ def get_role_ids(token, head_manager_excel, hr_manager_excel, employee_roles_dic
 #             "roleIds": []}
 def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict, legal_entity_excel, position_excel,
                               department_excel, root_department_id, head_manager_excel, hr_manager_excel,
-                              employee_roles_dict):
+                              employee_roles_dict, external_id):
     legal_entity_id = ''
     for id_name, name in legal_entity_dict.items():
         if name == legal_entity_excel:
@@ -278,11 +278,22 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     department_id = get_department(token, client_id, department_excel, root_department_id)
     role_ids = get_role_ids(token, head_manager_excel, hr_manager_excel, employee_roles_dict)
 
-    data = {"clientUserId": client_user_id,
-            "legalEntityId": legal_entity_id,
-            "departmentId": department_id,
-            "positionId": position_id,
-            "roleIds": role_ids}
+
+    # data = {"clientUserId": client_user_id,
+    #         "legalEntityId": legal_entity_id,
+    #         "departmentId": department_id,
+    #         "positionId": position_id,
+    #         "roleIds": role_ids,
+    #         "externalId": null}
+    employee_post = EmployeePost(client_user_id)
+    employee_post.legalEntityId = legal_entity_id
+    employee_post.departmentId = department_id
+    employee_post.positionId = position_id
+    employee_post.roleIds = role_ids
+    employee_post.externalId = external_id
+
+    data = json.loads(employee_post.toJSON())
+
     return data
 
 
@@ -305,7 +316,7 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
 
 # полное создание одного сотрудника:
 # создаем client_user
-# готовим данные для создания employee
+# вызываем функцию, которая приготовит данные для создания employee
 # создаем employee
 def create_employee_full(token, client_id, data_for_creating_user, legal_entity_dict, root_department_id,
                          employee_roles_dict, employee):
@@ -315,13 +326,15 @@ def create_employee_full(token, client_id, data_for_creating_user, legal_entity_
 
     head_manager_excel = employee.headManager
     hr_manager_excel = employee.hrManager
+
+    external_id = employee.externalId
     try:
         client_user_id = create_client_user(token, client_id, data_for_creating_user)
         if client_user_id:
 
             data = prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict, legal_entity_excel,
                                              position_excel, department_excel, root_department_id, head_manager_excel,
-                                             hr_manager_excel, employee_roles_dict)
+                                             hr_manager_excel, employee_roles_dict, external_id)
             create_employee_from_client_user(token, client_id, data)
             print('!!!')
         else:

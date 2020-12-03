@@ -64,6 +64,7 @@ def data2class(row):
         employee = Employee(row['Юрлицо'], head_manager, hr_manager)
         employee.department = row['Отдел']
         employee.position = row['Должность']
+        employee.externalId = row['ID сотрудника во внешней системе']
 
         return user, employee
     else:

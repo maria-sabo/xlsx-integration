@@ -7,6 +7,7 @@ class EmployeePost(JsonEncoder):
     departmentId = ''
     positionId = ''
     roleIds = []
+    externalId = ''
 
     def __init__(self, clientUserId):
         self.clientUserId = clientUserId
