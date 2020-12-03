@@ -1,6 +1,9 @@
 from src.classes.json_encoder import JsonEncoder
 
 
+# класс для хранения документа
+# будет храниться тип документа (например, 'SNILS' или 'INN')
+# и номер документа
 class Doc(JsonEncoder):
     type = ''
     number = ''

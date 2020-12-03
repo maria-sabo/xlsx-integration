@@ -7,13 +7,22 @@ from src.parameters import PHONE_PATTERN, EMAIL_PATTERN, AUTHORITY_CODE_PATTERN,
     REGION_CODES, RU_SERIAL_PASSPORT_PATTERN, RU_NUMBER_PASSPORT_PATTERN, INN_PATTERN
 
 
+def not_null_name_validate(name):
+    if type(name) is float and numpy.isnan(name):
+        print('Необходимо ввести значение в ячейки "Имя" и "Фамилия".')
+        return False
+    else:
+        return name
+
+
 def gender_validate(gender):
     if type(gender) is float and numpy.isnan(gender):
         return None
     else:
-        if gender == 'Ж':
+        gender_lower = gender.lower()
+        if gender_lower == 'ж':
             return 'FEMALE'
-        elif gender == 'M':
+        elif gender_lower == 'м':
             return 'MALE'
         else:
             print('Введен некорректный пол. Сотрудник будет создан без пола.')
@@ -80,31 +89,35 @@ def is_snils_correct(snils):
 def snils_validate(snils):
     if type(snils) is float and numpy.isnan(snils):
         print('Введите СНИЛС, иначе сотрудник не будет загружен.')
+        return False
     else:
         snils = snils.replace(' ', '')
         # проверка что запись снилса корректная (123-456-78912 либо вообще без "-")
         result = re.fullmatch(SNILS_PATTERN, snils)
         if result:
-            if is_snils_correct(result.group(0)):
-                return result.group(0)
+            snils = result.group(0).replace('-', '')
+            if is_snils_correct(snils):
+                return snils
             else:
                 print('Введен некорректный СНИЛС. Проблема с контрольной суммой. Сотрудник не будет загружен.')
+                return False
         else:
-            print('Некорректно введен СНИЛС. Формат: ххх-ххх-ххх хх. Сотрудник не будет загружен.')
+            print('Некорректно введен СНИЛС. Формат: ххх-ххх-ххх хх (можно без "-"). Сотрудник не будет загружен.')
+            return False
 
 
 def is_inn_correct(inn):
     control_sum_first = 0
-    arr = [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
-    for i in range(len(arr)):
-        control_sum_first += arr[i] * int(inn[i])
+    magic_arr = [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+    for i in range(len(magic_arr)):
+        control_sum_first += magic_arr[i] * int(inn[i])
     control_sum_first = control_sum_first % 11
     control_sum_first = control_sum_first % 10
 
     control_sum_second = 0
-    arr2 = [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
-    for i in range(len(arr2)):
-        control_sum_second += arr2[i] * int(inn[i])
+    magic_arr2 = [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+    for i in range(len(magic_arr2)):
+        control_sum_second += magic_arr2[i] * int(inn[i])
     control_sum_second = control_sum_second % 11
     control_sum_second = control_sum_second % 10
     return (inn[10] == str(control_sum_first)) and (inn[11] == str(control_sum_second))
@@ -173,6 +186,7 @@ def postal_code_validate(postal_code):
 def region_code_validate(region_name):
     if type(region_name) is float and numpy.isnan(region_name):
         return None
+
     else:
         if region_name in REGION_CODES.values():
             for code, name in REGION_CODES.items():
@@ -180,4 +194,35 @@ def region_code_validate(region_name):
                     return code
         else:
             print('Некорректно введен регион. Регион не будет записан.')
+            return None
+
+
+def head_manager_validate(head_manager_flag):
+    if type(head_manager_flag) is float and numpy.isnan(head_manager_flag):
+        print('Не введен флаг, имеет ли сотрудник роль "Руководитель". Сотрудник не будет загружен.')
+
+        return None
+    else:
+        head_manager_flag_lower = head_manager_flag.lower()
+        if head_manager_flag_lower == 'да':
+            return True
+        elif head_manager_flag_lower == 'нет':
+            return False
+        else:
+            print('Некорректно введен флаг роли сотрудника. Сотрудник не будет загружен.')
+            return None
+
+
+def hr_manager_validate(hr_manager_flag):
+    if type(hr_manager_flag) is float and numpy.isnan(hr_manager_flag):
+        print('Не введен флаг, имеет ли сотрудник роль "Кадровик". Сотрудник не будет загружен.')
+        return None
+    else:
+        hr_manager_flag_lower = hr_manager_flag.lower()
+        if hr_manager_flag_lower == 'да':
+            return True
+        elif hr_manager_flag_lower == 'нет':
+            return False
+        else:
+            print('Некорректно введен флаг роли сотрудника. Сотрудник не будет загружен.')
             return None

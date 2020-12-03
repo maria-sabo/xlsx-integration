@@ -4,18 +4,22 @@ import json
 import sys
 import requests
 from src.convert import xlsx2df, data2class, get_snils
-from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils
+from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils, \
+    get_employee_roles_dict, get_role_ids, get_root_department_id
+
+ARGS_COUNT = 3
 
 
 def main():
-    r = requests.get('https://app-test1.hr-link.ru/api/v1/version')
-    print('Welcome: ' + r.text + '\n')
+    print('Welcome: ' + requests.get('https://app-test1.hr-link.ru/api/v1/version').text + '\n')
 
-    if sys.argv.__len__() == 3:
+    if sys.argv.__len__() == ARGS_COUNT:
         excel_name = sys.argv[1]
         token = sys.argv[2]
 
         client_id = get_client_id_by_token(token)
+        root_department_id = get_root_department_id(token, client_id)
+        employee_roles_dict = get_employee_roles_dict(token)
 
         if client_id:
             df = xlsx2df(excel_name)
@@ -27,27 +31,17 @@ def main():
                 for i, row in df.iterrows():
                     print('creating employee #: ' + str(i))
                     snils = get_snils(row)
-                    if snils:
-                        snils = snils.replace(' ', '').replace('-', '')
 
-                    if not (snils in lst_person_snils):
+                    if snils and not (snils in lst_person_snils):
                         user, employee = data2class(row)
                         if user and employee:
-                            legal_entity_excel = employee.legalEntity
-                            position_excel = employee.position
-                            department_excel = employee.department
-
-                            data_client_user = json.loads(user.toJSON())
-
-                            create_employee_full(token, client_id, data_client_user, legal_entity_excel,
-                                                 legal_entity_dict,
-                                                 position_excel, department_excel)
-
+                            data_for_creating_user = json.loads(user.toJSON())
+                            create_employee_full(token, client_id, data_for_creating_user, legal_entity_dict,
+                                                 root_department_id,
+                                                 employee_roles_dict, employee)
                             lst_person_snils.append(snils)
-                        # else:
-                        # print('Некорректный СНИЛС, ИНН или паспорт.')
                     else:
-                        print('Пользователь с таким снилсом уже существует в сервисе.')
+                        print('Пользователь с таким СНИЛСом уже существует в сервисе. Или введен некорректный СНИЛС.')
         else:
             print('Клиент не найден.')
     else:

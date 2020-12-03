@@ -1,6 +1,9 @@
 from src.classes.json_encoder import JsonEncoder
 
 
+# класс для хранения данных пользователя
+# обязательные поля -- фамилия, имя
+# без них не создать экземпляр класса
 class User(JsonEncoder):
     lastName = ''
     firstName = ''
@@ -13,9 +16,6 @@ class User(JsonEncoder):
     # SNILS, INN, PASSPORT (внутри PASSPORT registrationAddress)
     personalDocuments = []
 
-    def __init__(self, lastName):
+    def __init__(self, lastName, firstName):
         self.lastName = lastName
-
-    def __str__(self):
-        return "Имя: {} \t Фамилия: {}\t Дата рождения: {}\t".format(self.firstName, self.lastName,
-                                                                     self.birthdate)
+        self.firstName = firstName

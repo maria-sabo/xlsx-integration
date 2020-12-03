@@ -2,6 +2,9 @@ from src.classes.address import Address
 from src.classes.json_encoder import JsonEncoder
 
 
+# класс для хранения данных паспорта
+# обязательные поля -- тип, серия, номер
+# без них не создать экземпляр класса
 class Passport(JsonEncoder):
     type = ''
     number = ''

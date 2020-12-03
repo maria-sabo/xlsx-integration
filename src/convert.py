@@ -8,22 +8,31 @@ from src.classes.employee import Employee
 from src.classes.passport import Passport
 from src.data_validate import gender_validate, date_validate, phone_validate, authority_code_validate, \
     postal_code_validate, snils_validate, email_validate, region_code_validate, number_validate, serial_number_validate, \
-    inn_validate
+    inn_validate, not_null_name_validate, hr_manager_validate, head_manager_validate
 
 
+# получение значения, прошедшего валидацию, из ячейки СНИЛС
 def get_snils(row):
     return snils_validate(row['СНИЛС'])
 
 
+# если значения из ячеек серия паспорта, номер паспорта, СНИЛС, ИНН, фамилия, имя непустые и прошли валидацию,
+# то данные одной строки проходят валидацию и записываюстся в объект класса User и в объект класса Employee
 def data2class(row):
     passport_number = number_validate(row['Паспорт:Номер'])
     passport_serial_number = serial_number_validate(row['Паспорт:Серия'])
     snils = snils_validate(row['СНИЛС'])
     inn = inn_validate(row['ИНН ФЛ'])
 
-    if passport_number and passport_serial_number and snils and inn:
-        user = User(row['Фамилия'])
-        user.firstName = row['Имя']
+    first_name = not_null_name_validate(row['Имя'])
+    last_name = not_null_name_validate(row['Фамилия'])
+
+    head_manager = head_manager_validate(row['Руководитель'])
+    hr_manager = hr_manager_validate(row['Кадровый сотрудник'])
+
+    if (passport_number and passport_serial_number and snils and inn) and (first_name and last_name) and (
+            head_manager is not None) and (hr_manager is not None):
+        user = User(last_name, first_name)
         user.patronymic = row['Отчество']
 
         user.gender = gender_validate(row['Пол'])
@@ -52,7 +61,7 @@ def data2class(row):
         user.personalDocuments.append(Doc('SNILS', snils))
         user.personalDocuments.append(Doc('INN', inn))
 
-        employee = Employee(row['Юрлицо'], row['Руководитель'], row['Кадровый сотрудник'])
+        employee = Employee(row['Юрлицо'], head_manager, hr_manager)
         employee.department = row['Отдел']
         employee.position = row['Должность']
 
@@ -61,6 +70,11 @@ def data2class(row):
         return False, False
 
 
+# excel таблица переводится в df
+# удаляются три ненужные верхние строки (название, да/нет, пример)
+# удаляется ненужный первый столбец
+# убираются все переводы строк, значения ячеек триммируюстя справа и слева
+# все значения в ячейках приводятся к строковому типу
 def xlsx2df(excel_name):
     df = pd.read_excel(excel_name, sheet_name=0)
 
