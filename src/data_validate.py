@@ -9,7 +9,7 @@ from src.parameters import PHONE_PATTERN, EMAIL_PATTERN, AUTHORITY_CODE_PATTERN,
 
 def not_null_name_validate(name):
     if type(name) is float and numpy.isnan(name):
-        print('Необходимо ввести значение в ячейки "Имя" и "Фамилия".')
+        print('Необходимо ввести значения в ячейки "Имя" и "Фамилия".')
         return False
     else:
         return name
@@ -232,3 +232,5 @@ def external_id_validate(external_id):
     if type(external_id) is float and numpy.isnan(external_id):
         # print('В данные сотрудника не будет записан external_id.')
         return None
+    else:
+        return external_id

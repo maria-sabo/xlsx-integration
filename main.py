@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import json
 import sys
 import requests
-from src.convert import xlsx2df, data2class, get_snils
-from src.methods import get_client_id_by_token, create_employee_full, check_legal_entities_excel, lst_snils, \
-    get_employee_roles_dict, get_role_ids, get_root_department_id
+
+from src.classes.data_for_creating_employee import DataCreateEmployee
+from src.convert import xlsx2df
+
+from src.methods.check_legal_entities import check_legal_entities_excel
+from src.methods.create_client_user import get_client_id_by_token
+from src.methods.data_from_server import get_root_department_id, get_employee_role_ids, get_departments_dict, \
+    lst_snils, get_positions_dict
+from src.methods.create_employee import create_employees
 
 ARGS_COUNT = 3
 
@@ -14,34 +19,26 @@ def main():
     print('Welcome: ' + requests.get('https://app-test1.hr-link.ru/api/v1/version').text + '\n')
 
     if sys.argv.__len__() == ARGS_COUNT:
+        data = DataCreateEmployee
         excel_name = sys.argv[1]
-        token = sys.argv[2]
+        data.token = sys.argv[2]
 
-        client_id = get_client_id_by_token(token)
-        root_department_id = get_root_department_id(token, client_id)
-        employee_roles_dict = get_employee_roles_dict(token)
+        data.client_id = get_client_id_by_token(data.token)
 
-        if client_id:
+        if data.client_id:
             df = xlsx2df(excel_name)
-            excel_column_legal_entity = df['Юрлицо'].values
-            legal_entity_dict = check_legal_entities_excel(token, client_id, excel_column_legal_entity)
-            lst_person_snils = lst_snils(token, client_id)
+            if df is not False:
+                data.root_department_id = get_root_department_id(data.token, data.client_id)
+                data.head_manager_id, data.hr_manager_id = get_employee_role_ids(data.token)
+                data.checked_legal_entity_dict = check_legal_entities_excel(data.token, data.client_id,
+                                                                            df['Юрлицо'].values)
+                data.positions_dict = get_positions_dict(data.token, data.client_id)
+                data.departments_dict = get_departments_dict(data.token, data.client_id)
+                data.lst_person_snils = lst_snils(data.token, data.client_id)
 
-            if legal_entity_dict:
-                for i, row in df.iterrows():
-                    print('creating employee #: ' + str(i))
-                    snils = get_snils(row)
-
-                    if snils and not (snils in lst_person_snils):
-                        user, employee = data2class(row)
-                        if user and employee:
-                            data_for_creating_user = json.loads(user.toJSON())
-                            create_employee_full(token, client_id, data_for_creating_user, legal_entity_dict,
-                                                 root_department_id,
-                                                 employee_roles_dict, employee)
-                            lst_person_snils.append(snils)
-                    else:
-                        print('Пользователь с таким СНИЛСом уже существует в сервисе. Или введен некорректный СНИЛС.')
+                create_employees(data, df)
+            else:
+                print('Переданный файл ' + excel_name + ' не найден.')
         else:
             print('Клиент не найден.')
     else:

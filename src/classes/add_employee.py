@@ -1,7 +1,7 @@
 from src.classes.json_encoder import JsonEncoder
 
 
-class EmployeePost(JsonEncoder):
+class AddEmployee(JsonEncoder):
     clientUserId = ''
     legalEntityId = ''
     departmentId = ''

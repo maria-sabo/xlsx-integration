@@ -77,19 +77,6 @@ def data2class(row):
     else:
         return False, False
 
-# def is_correct(user, employee, token, client_id):
-#     snils =  user.snils
-#     phone = user.phone
-#     email = user.email
-#
-#     email_phone_lst = []
-#
-#
-#     if not snils:
-#         print('Необходимо ввести СНИЛС.')
-#         return False
-
-
 
 # excel таблица переводится в df
 # удаляются три ненужные верхние строки (название, да/нет, пример)
@@ -97,14 +84,16 @@ def data2class(row):
 # убираются все переводы строк, значения ячеек триммируюстя справа и слева
 # все значения в ячейках приводятся к строковому типу
 def xlsx2df(excel_name):
-    df = pd.read_excel(excel_name, sheet_name=0)
+    try:
+        df = pd.read_excel(excel_name, sheet_name=0)
+        df.drop([0, 1, 2], inplace=True)
+        df.drop(df.columns[0], axis=1, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+        df.columns = df.columns.str.replace('\n', '')
+        df.columns = df.columns.str.strip()
 
-    df.drop([0, 1, 2], inplace=True)
-    df.drop(df.columns[0], axis=1, inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    df.columns = df.columns.str.replace('\n', '')
-    df.columns = df.columns.str.strip()
-
-    df = df.astype(str)
-    df.replace('nan', numpy.nan, inplace=True)
-    return df
+        df = df.astype(str)
+        df.replace('nan', numpy.nan, inplace=True)
+        return df
+    except FileNotFoundError:
+        return False
