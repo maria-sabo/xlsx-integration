@@ -1,9 +1,3 @@
-# готовим данные для создания employee
-# data =      {"clientUserId": client_user_id,
-#             "legalEntityId": legal_entity_id,
-#             "departmentId": department_id,
-#             "positionId": position_id,
-#             "roleIds": []}
 import json
 
 import requests
@@ -15,6 +9,7 @@ from src.methods.get_for_employee import get_external_id, get_department, get_ro
 from src.methods.data_from_server import get_external_id_lst
 
 
+# готовим данные для создания employee
 def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict,
                               legal_entity_excel,
                               position_excel, positions_dict, department_excel, root_department_id,
@@ -23,7 +18,7 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
                               hr_manager_excel, head_manager_id, hr_manager_id, external_id_excel):
     legal_entity_id = ''
     for id_name, name in legal_entity_dict.items():
-        if name == legal_entity_excel:
+        if (name[0] == legal_entity_excel) or (name[1] == legal_entity_excel):
             legal_entity_id = id_name
 
     external_id_lst = get_external_id_lst(token, client_id, legal_entity_id)
@@ -102,19 +97,15 @@ def create_employee_full(data):
 
 
 # создаем employees
-def create_employees(data, df):
+def create_employees(data, data_users, df):
     if data.checked_legal_entity_dict:
         for i, row in df.iterrows():
             print('creating employee #: ' + str(i))
-            snils = get_snils(row)
+            user, employee = data2class(row, data_users)
+            if user and employee:
+                data.user = user
+                data.employee = employee
+                create_employee_full(data)
 
-            if snils and not (snils in data.lst_person_snils):
-                user, employee = data2class(row)
-                if user and employee:
-                    data.user = user
-                    data.employee = employee
-
-                    create_employee_full(data)
-                    data.lst_person_snils.append(snils)
             else:
-                print('Пользователь с таким СНИЛСом уже существует в сервисе. Или введен некорректный СНИЛС.')
+                print('ERROR')

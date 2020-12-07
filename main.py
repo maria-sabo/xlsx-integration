@@ -9,7 +9,7 @@ from src.convert import xlsx2df
 from src.methods.check_legal_entities import check_legal_entities_excel
 from src.methods.create_client_user import get_client_id_by_token
 from src.methods.data_from_server import get_root_department_id, get_employee_role_ids, get_departments_dict, \
-    lst_snils, get_positions_dict
+    lst_snils, get_positions_dict,  get_lst_about_users
 from src.methods.create_employee import create_employees
 
 ARGS_COUNT = 3
@@ -20,23 +20,26 @@ def main():
 
     if sys.argv.__len__() == ARGS_COUNT:
         data = DataCreateEmployee
+
         excel_name = sys.argv[1]
         data.token = sys.argv[2]
 
         data.client_id = get_client_id_by_token(data.token)
 
         if data.client_id:
+
             df = xlsx2df(excel_name)
             if df is not False:
-                data.root_department_id = get_root_department_id(data.token, data.client_id)
-                data.head_manager_id, data.hr_manager_id = get_employee_role_ids(data.token)
+                data_users = get_lst_about_users(data.token, data.client_id)
                 data.checked_legal_entity_dict = check_legal_entities_excel(data.token, data.client_id,
                                                                             df['Юрлицо'].values)
+                data.root_department_id = get_root_department_id(data.token, data.client_id)
+                data.head_manager_id, data.hr_manager_id = get_employee_role_ids(data.token)
                 data.positions_dict = get_positions_dict(data.token, data.client_id)
                 data.departments_dict = get_departments_dict(data.token, data.client_id)
                 data.lst_person_snils = lst_snils(data.token, data.client_id)
 
-                create_employees(data, df)
+                create_employees(data, data_users, df)
             else:
                 print('Переданный файл ' + excel_name + ' не найден.')
         else:

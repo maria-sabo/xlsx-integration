@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy
 
+from src.classes.data_from_server_user import DataFromServerAboutUsers
 from src.classes.user import User
 from src.classes.address import Address
 from src.classes.doc import Doc
@@ -8,7 +9,8 @@ from src.classes.employee import Employee
 from src.classes.passport import Passport
 from src.data_validate import gender_validate, date_validate, phone_validate, authority_code_validate, \
     postal_code_validate, snils_validate, email_validate, region_code_validate, number_validate, serial_number_validate, \
-    inn_validate, not_null_name_validate, hr_manager_validate, head_manager_validate, external_id_validate
+    inn_validate, not_null_name_validate, hr_manager_validate, head_manager_validate, external_id_validate, \
+    passport_exists, email_exists, phone_exists, snils_exists, inn_exists
 
 
 # получение значения, прошедшего валидацию, из ячейки СНИЛС
@@ -18,11 +20,16 @@ def get_snils(row):
 
 # если значения из ячеек серия паспорта, номер паспорта, СНИЛС, ИНН, фамилия, имя непустые и прошли валидацию,
 # то данные одной строки проходят валидацию и записываюстся в объект класса User и в объект класса Employee
-def data2class(row):
+def data2class(row, data_users):
     passport_number = number_validate(row['Паспорт:Номер'])
     passport_serial_number = serial_number_validate(row['Паспорт:Серия'])
+
     snils = snils_validate(row['СНИЛС'])
     inn = inn_validate(row['ИНН ФЛ'])
+    if passport_exists(passport_serial_number + passport_number, data_users) or snils_exists(snils,
+                                                                                             data_users) or inn_exists(
+        inn, data_users):
+        return False, False
 
     first_name = not_null_name_validate(row['Имя'])
     last_name = not_null_name_validate(row['Фамилия'])
@@ -33,9 +40,8 @@ def data2class(row):
     phone = phone_validate(row['Номер телефона'])
     email = email_validate(row['Электронная почта'])
 
-    # добавить проверку (phone, login)
-    # flag_new_email, flag_new_phone = is_email_phone_new(token, cli)
-    # is_phone_new =
+    if email_exists(email, data_users) or phone_exists(phone, data_users):
+        return False, False
 
     if (passport_number and passport_serial_number and snils and inn) and (first_name and last_name) and (
             head_manager is not None) and (hr_manager is not None):
@@ -73,6 +79,13 @@ def data2class(row):
         employee.position = row['Должность']
         employee.externalId = external_id_validate(row['ID сотрудника во внешней системе'])
 
+        data_users.lst_person_snils.append(snils)
+        data_users.lst_person_inn.append(inn)
+        data_users.lst_person_passport.append(passport_serial_number + passport_number)
+        data_users.lst_person_email_phone.append(email)
+        data_users.lst_person_email_phone.append(phone)
+        data_users.lst_person_email_phone = list(filter(None, data_users.lst_person_email_phone))
+        data_users.lst_person_email_phone = list(filter(None, data_users.lst_person_email_phone))
         return user, employee
     else:
         return False, False
