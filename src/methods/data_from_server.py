@@ -1,8 +1,10 @@
 import json
 import requests
 
-
 # получаем список всех снилсов в сервисе
+from src.classes.data_from_server_user import DataFromServerAboutUsers
+
+
 def lst_snils(token, client_id):
     snils_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                                   headers={'User-Api-Token': token})
@@ -118,3 +120,44 @@ def get_external_id_lst(token, client_id, legal_entity_id):
     else:
         print('Ошибка.' + response_dict.get('errorMessage'))
     return []
+
+
+#
+def get_lst_about_users(token, client_id):
+    response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+                            headers={'User-Api-Token': token})
+    response_dict = json.loads(response.text)
+    data_users = DataFromServerAboutUsers
+    # lst_person_snils = []
+    # lst_person_inn = []
+    # lst_person_passport = []
+    # lst_person_phone = []
+    # lst_person_email = []
+
+    if response_dict.get('result'):
+        lst_employees = response_dict.get('employees')
+        for employee in lst_employees:
+
+            # data_users.lst_person_phone.append(employee.get('phone'))
+            # data_users.lst_person_email.append(employee.get('email'))
+            personal_documents = employee.get('personalDocuments')
+            for personal_document in personal_documents:
+                if personal_document['type'] == "SNILS":
+                    data_users.lst_person_snils.append(personal_document['number'])
+                if personal_document['type'] == "INN":
+                    data_users.lst_person_inn.append(personal_document['number'])
+                if personal_document['type'] == "PASSPORT":
+                    data_users.lst_person_passport.append(
+                        personal_document['serialNumber'] + personal_document['number'])
+            notification_channels = employee.get('notificationChannels')
+            for notification_channel in notification_channels:
+                data_users.lst_person_email_phone.append(notification_channel['login'])
+
+            # lst_person_snils = list(filter(None, lst_person_snils))
+            # lst_person_inn = list(filter(None, lst_person_inn))
+            # lst_person_passport = list(filter(None, lst_person_passport))
+            data_users.lst_person_email_phone= list(filter(None, data_users.lst_person_email_phone))
+        return data_users
+    else:
+        print('Ошибка. Не удалось получить сотрудников и их СНИЛСы. ' + response_dict.get('errorMessage'))
+        return False

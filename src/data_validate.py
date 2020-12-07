@@ -234,3 +234,38 @@ def external_id_validate(external_id):
         return None
     else:
         return external_id
+
+
+def snils_exists(snils, data_users):
+    if snils in data_users.lst_person_snils:
+        print('Пользователь с таким СНИЛСом уже существует в сервисе.')
+        return True
+    return False
+
+
+def inn_exists(inn, data_users):
+    if inn in data_users.lst_person_inn:
+        print('Пользователь с таким ИНН уже существует в сервисе.')
+        return True
+    return False
+
+
+def passport_exists(passport, data_users):
+    if passport in data_users.lst_person_passport:
+        print('Пользователь с таким паспортом уже существует в сервисе.')
+        return True
+    return False
+
+
+def email_exists(email, data_users):
+    if email in data_users.lst_person_email_phone:
+        print('Пользователь с таким email уже существует в сервисе.')
+        return True
+    return False
+
+
+def phone_exists(phone, data_users):
+    if phone in data_users.lst_person_email_phone:
+        print('Пользователь с таким phone уже существует в сервисе.')
+        return True
+    return False
