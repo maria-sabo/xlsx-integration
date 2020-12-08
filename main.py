@@ -27,7 +27,6 @@ def main():
         data.client_id = get_client_id_by_token(data.token)
 
         if data.client_id:
-
             df = xlsx2df(excel_name)
             if df is not False:
                 data_users = get_lst_about_users(data.token, data.client_id)

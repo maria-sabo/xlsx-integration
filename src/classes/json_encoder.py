@@ -2,7 +2,7 @@ import simplejson
 
 
 # экземпляр класса можно будет сериализовать
-# ignore_nan = True -- nan-ы из ячеек станут null
+# ignore_nan = True -- nan-ы из ячеек не будут сериализованы
 class JsonEncoder:
 
     def toJSON(self):

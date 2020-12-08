@@ -7,6 +7,7 @@ from src.parameters import PHONE_PATTERN, EMAIL_PATTERN, AUTHORITY_CODE_PATTERN,
     REGION_CODES, RU_SERIAL_PASSPORT_PATTERN, RU_NUMBER_PASSPORT_PATTERN, INN_PATTERN
 
 
+# проверка, что ячейки "Имя" и "Фамилия" заполнены
 def not_null_name_validate(name):
     if type(name) is float and numpy.isnan(name):
         print('Необходимо ввести значения в ячейки "Имя" и "Фамилия".')
@@ -15,6 +16,8 @@ def not_null_name_validate(name):
         return name
 
 
+# валидация занчений из ячейки "Пол"
+# преобразует значения, в значения, которые примет сервер (FEMALE/MALE)
 def gender_validate(gender):
     if type(gender) is float and numpy.isnan(gender):
         return None
@@ -29,6 +32,10 @@ def gender_validate(gender):
             return None
 
 
+# валидация даты
+# приводит дату в формат, принимаемый сервером
+# если не удается привести к заданному формату, то возвраащет None
+# (дата не будет отправлена на сервер при создании client_user)
 def date_validate(date):
     if type(date) is float and numpy.isnan(date):
         return None
@@ -41,12 +48,18 @@ def date_validate(date):
             return None
 
 
+# валидация номер телефона
+# если номер телефона полностью соответуствует регулярному выражению, то
+# он будет записан при создании client_user
 def phone_validate(phone):
     if type(phone) is float and numpy.isnan(phone):
         return None
     else:
         result = re.fullmatch(PHONE_PATTERN, phone)
         if result:
+            # добавить преобразование к единому формату, например 79xxxxxxxxx
+            #
+            # if len(result.group(0) == )
             return result.group(0)
         else:
             print(
@@ -54,6 +67,9 @@ def phone_validate(phone):
             return None
 
 
+# валидация email
+# если email полностью соответуствует регулярному выражению, то
+# он будет записан при создании client_user
 def email_validate(email):
     if type(email) is float and numpy.isnan(email):
         return None
@@ -66,6 +82,9 @@ def email_validate(email):
             return None
 
 
+# проверка корректности СНИЛС
+# рассчитывается контрольная сумма по существующему алгоритму
+# возвращает True, если сумма корректная, False -- если нет
 def is_snils_correct(snils):
     controlSum = None
     snils = snils.replace('-', '')
@@ -86,6 +105,9 @@ def is_snils_correct(snils):
     return result
 
 
+# валидация СНИЛС
+# проверка соответствия записи СНИЛСа регулярному выражению (123-456-78912 либо вообще без "-", пробелы можно)
+# если валидация записи прошла, то проверяется корректность контрольной суммы
 def snils_validate(snils):
     if type(snils) is float and numpy.isnan(snils):
         print('Введите СНИЛС, иначе сотрудник не будет загружен.')
@@ -106,6 +128,9 @@ def snils_validate(snils):
             return False
 
 
+# проверка корректности ИНН
+# рассчитываются контрольные суммы по существующему алгоритму
+# возвращает True, если суммы корректные, False -- если нет
 def is_inn_correct(inn):
     control_sum_first = 0
     magic_arr = [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
@@ -123,6 +148,8 @@ def is_inn_correct(inn):
     return (inn[10] == str(control_sum_first)) and (inn[11] == str(control_sum_second))
 
 
+# проверяетя полное соответствие заданному паттерну (передано 12 цифр)
+# проверяется коррекность контрольных сумм
 def inn_validate(inn):
     if type(inn) is float and numpy.isnan(inn):
         print('Введите ИНН ФЛ, иначе сотрудник не будет загружен.')
@@ -137,6 +164,7 @@ def inn_validate(inn):
             print('Некорректно введен ИНН ФЛ. Сотрудник не будет загружен.')
 
 
+# проверяется полное соответствие регулярному выражению (серия паспорта -- 4 цифры)
 def serial_number_validate(serial_number):
     if type(serial_number) is float and numpy.isnan(serial_number):
         print('Введите серию паспорта, иначе сотрудник не будет загружен.')
@@ -148,6 +176,7 @@ def serial_number_validate(serial_number):
             print('Некорректно введена серия паспорта. Сотрудник не будет загружен.')
 
 
+# проверяется полное соответствие регулярному выражению (номер паспорта -- 6 цифр)
 def number_validate(number):
     if type(number) is float and numpy.isnan(number):
         print('Введите номер паспорта, иначе сотрудник не будет загружен.')
@@ -159,6 +188,8 @@ def number_validate(number):
             print('Некорректно введен номер паспорта. Сотрудник не будет загружен.')
 
 
+# валидация authority_code
+# запись соответствует 3 цифры - 3 цифры
 def authority_code_validate(authority_code):
     if type(authority_code) is float and numpy.isnan(authority_code):
         return None
@@ -171,6 +202,8 @@ def authority_code_validate(authority_code):
             return None
 
 
+# валидация индекса
+# запись соответствует 6 цифрам
 def postal_code_validate(postal_code):
     if type(postal_code) is float and numpy.isnan(postal_code):
         return None
@@ -183,6 +216,10 @@ def postal_code_validate(postal_code):
             return None
 
 
+# валидация кода региона
+# берется строковое значение из excel-таблицы
+# проверяется присутствие в заданном словаре REGION_CODES
+# возвращается код региона
 def region_code_validate(region_name):
     if type(region_name) is float and numpy.isnan(region_name):
         return None
@@ -197,6 +234,9 @@ def region_code_validate(region_name):
             return None
 
 
+# валидация поля "Руководитель"
+# если передано "Да", то возвращается True
+# если передано "Нет", то возвращается False
 def head_manager_validate(head_manager_flag):
     if type(head_manager_flag) is float and numpy.isnan(head_manager_flag):
         print('Не введен флаг, имеет ли сотрудник роль "Руководитель". Сотрудник не будет загружен.')
@@ -213,6 +253,9 @@ def head_manager_validate(head_manager_flag):
             return None
 
 
+# валидация поля "Кадровик"
+# если передано "Да", то возвращается True
+# если передано "Нет", то возвращается False
 def hr_manager_validate(hr_manager_flag):
     if type(hr_manager_flag) is float and numpy.isnan(hr_manager_flag):
         print('Не введен флаг, имеет ли сотрудник роль "Кадровик". Сотрудник не будет загружен.')
@@ -228,6 +271,7 @@ def hr_manager_validate(hr_manager_flag):
             return None
 
 
+# валидация поля ID внешней системы
 def external_id_validate(external_id):
     if type(external_id) is float and numpy.isnan(external_id):
         # print('В данные сотрудника не будет записан external_id.')
@@ -236,6 +280,8 @@ def external_id_validate(external_id):
         return external_id
 
 
+# проверка существования СНИЛС в списке, полученном с сервера
+# печать ошибки, если пользователь с таким СНИЛС уже загружен
 def snils_exists(snils, data_users):
     if snils in data_users.lst_person_snils:
         print('Пользователь с таким СНИЛСом уже существует в сервисе.')
@@ -243,6 +289,8 @@ def snils_exists(snils, data_users):
     return False
 
 
+# проверка существования ИНН в списке, полученном с сервера
+# печать ошибки, если пользователь с таким ИНН уже загружен
 def inn_exists(inn, data_users):
     if inn in data_users.lst_person_inn:
         print('Пользователь с таким ИНН уже существует в сервисе.')
@@ -250,6 +298,8 @@ def inn_exists(inn, data_users):
     return False
 
 
+# проверка существования номера и серии паспорта в списке, полученном с сервера
+# печать ошибки, если пользователь с таким паспортом уже загружен
 def passport_exists(passport, data_users):
     if passport in data_users.lst_person_passport:
         print('Пользователь с таким паспортом уже существует в сервисе.')
@@ -257,6 +307,8 @@ def passport_exists(passport, data_users):
     return False
 
 
+# проверка существования email в списке, полученном с сервера
+# печать ошибки, если пользователь с таким email уже загружен
 def email_exists(email, data_users):
     if email in data_users.lst_person_email_phone:
         print('Пользователь с таким email уже существует в сервисе.')
@@ -264,6 +316,8 @@ def email_exists(email, data_users):
     return False
 
 
+# проверка существования номера телефона в списке, полученном с сервера
+# печать ошибки, если пользователь с таким телефоном уже загружен
 def phone_exists(phone, data_users):
     if phone in data_users.lst_person_email_phone:
         print('Пользователь с таким phone уже существует в сервисе.')
