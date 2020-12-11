@@ -57,11 +57,9 @@ def phone_validate(phone):
     else:
         result = re.fullmatch(PHONE_PATTERN, phone)
         if result:
-            # добавить преобразование к единому формату, например 79xxxxxxxxx
-            # *
+            # добавить преобразование к единому формату, например 9xxxxxxxxx
             res_phone = result.group(0).replace('-', '').replace('+', '')
             res_phone = res_phone.replace('(', '').replace(')', '')
-            # result.group(0).replace('(', '').replace(')', '')
             if len(res_phone) > 10:
                 return res_phone[1:len(res_phone)]
             else:

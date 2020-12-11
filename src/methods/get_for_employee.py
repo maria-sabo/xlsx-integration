@@ -21,14 +21,12 @@ def get_position(token, client_id, position_excel, positions_dict):
 # получаем id переданного в excel-е отдела у нас в сервисе
 # если такого отдела не существует, создаем его и получаем новый id
 def get_department(token, client_id, department_excel, root_department_id, departments_dict):
-    # dict_departments = get_departments_dict(token, client_id)
     for department_id, department_name in departments_dict.items():
         if type(department_excel) is float and numpy.isnan(department_excel):
             return ""
         else:
             if department_name.lower() == department_excel.lower():
                 return department_id
-
     # если нет отдела, то создаем его
     department_id = create_department(token, client_id, department_excel, root_department_id)
     departments_dict[department_id] = department_excel
@@ -39,11 +37,6 @@ def get_department(token, client_id, department_excel, root_department_id, depar
 # возвращает список ролей для создания сотрудника
 def get_role_ids(head_manager_excel, hr_manager_excel, head_manager_id, hr_manager_id):
     role_ids = []
-    # for employee_role_id, employee_role_name in employee_roles_dict.items():
-    #     if employee_role_name == 'Руководитель':
-    #         head_manager_id = employee_role_id
-    #     elif employee_role_name == 'Кадровик':
-    #         hr_manager_id = employee_role_id
     if head_manager_excel and hr_manager_excel:
         role_ids.append(head_manager_id)
         role_ids.append(hr_manager_id)
