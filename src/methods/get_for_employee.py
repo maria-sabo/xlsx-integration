@@ -6,10 +6,8 @@ from src.methods.create_for_employee import create_position, create_department
 
 
 def get_position(token, client_id, position_excel, positions_dict):
-    # dict_positions = get_positions_dict(token, client_id)
     for position_id, position_name in positions_dict.items():
         if type(position_excel) is float and numpy.isnan(position_excel):
-            # если ячейка не заполнена, то
             return ""
         else:
             if position_name.lower() == position_excel.lower():
@@ -26,8 +24,6 @@ def get_department(token, client_id, department_excel, root_department_id, depar
     # dict_departments = get_departments_dict(token, client_id)
     for department_id, department_name in departments_dict.items():
         if type(department_excel) is float and numpy.isnan(department_excel):
-            # если ячейка не заполнена, то
-            # department_id = create_department(token, client_id, department_excel)
             return ""
         else:
             if department_name.lower() == department_excel.lower():

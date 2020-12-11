@@ -1,6 +1,7 @@
 from src.classes.employee import Employee
 from src.classes.user import User
 
+
 # класс, хранящий данные для создания сотрудника
 class DataCreateEmployee:
     token = ''

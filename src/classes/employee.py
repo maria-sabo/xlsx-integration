@@ -1,6 +1,7 @@
 from src.classes.json_encoder import JsonEncoder
 
 
+# экземпляр класса будет хранить полученные из excel таблицы данные для создания сотрудника из client_user
 class Employee(JsonEncoder):
     legalEntity = ''
     department = ''
