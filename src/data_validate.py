@@ -179,6 +179,7 @@ def serial_number_validate(serial_number):
             print('Некорректно введена серия паспорта. Сотрудник не будет загружен.')
 
 
+
 # проверяется полное соответствие регулярному выражению (номер паспорта -- 6 цифр)
 def number_validate(number):
     if type(number) is float and numpy.isnan(number):

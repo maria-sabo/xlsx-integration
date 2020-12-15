@@ -1,14 +1,25 @@
-# проверка, все ли юрлица из excel уже есть в сервисе
 import json
 import requests
 
 
 def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
+    """
+    Проверяет существует ли каждое значение (название юрлица) из столбца "Юрлицо" excel-таблицы  в сервисе
+        Если все названия юрлиц есть в сервисе, то функция возвращает словарь пар идентификатор-список
+        (в списке будут находиться названия, которые присутствовали в excel-таблице,
+        то есть одному индентификатору будет соответствовать список, содержащий либо только 'Название',
+        либо только 'Сокращенное название', либо 'Название' и 'Сокращенное название' )
+        Если хотя бы одного названия юрлица из столбца "Юрлицо" excel-таблицы нет в сервисе, то возвращает False
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :param excel_column_legal_entity: Массив строк из столбца "Юрлицо" excel-таблицы
+    :return: Словарь {'id':['name', 'name'], 'id2': ['name2', 'name2'], ...} либо False
+    """
     legal_entity_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
                                          headers={'User-Api-Token': token})
     response_dict = json.loads(legal_entity_response.text)
     legal_entity_dict = {}
-    legal_entity_name_lst = []
     legal_entity_name_dict = {}
     if response_dict.get('result'):
         lst_legal_entities = response_dict.get('legalEntities')

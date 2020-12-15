@@ -28,8 +28,12 @@ def data2class(row, data_users):
 
     snils = snils_validate(row['СНИЛС'])
     inn = inn_validate(row['ИНН ФЛ'])
-    if passport_exists(passport_serial_number + passport_number, data_users) or snils_exists(snils,
-                                                                                             data_users) or inn_exists(
+    # if not passport_number and not passport_serial_number and not snils and not inn):
+    #     return False, False
+
+    if passport_number and passport_serial_number and snils and inn and passport_exists(
+            passport_serial_number + passport_number, data_users) or snils_exists(snils,
+                                                                                  data_users) or inn_exists(
         inn, data_users):
         return False, False
 
@@ -106,8 +110,10 @@ def xlsx2df(excel_name):
         df.reset_index(drop=True, inplace=True)
         df.columns = df.columns.str.replace('\n', '')
         df.columns = df.columns.str.strip()
-
         df = df.astype(str)
+        df = df.apply(lambda x: x.str.strip())
+
+        # df = df.astype(str)
         df.replace('nan', numpy.nan, inplace=True)
         return df
     except FileNotFoundError:

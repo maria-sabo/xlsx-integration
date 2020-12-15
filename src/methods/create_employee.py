@@ -3,7 +3,7 @@ import json
 import requests
 
 from src.classes.add_employee import AddEmployee
-from src.convert import get_snils, data2class
+from src.convert import data2class
 from src.methods.create_client_user import create_client_user
 from src.methods.get_for_employee import get_external_id, get_department, get_role_ids, get_position
 from src.methods.data_from_server import get_external_id_lst
@@ -16,6 +16,25 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
                               departments_dict,
                               head_manager_excel,
                               hr_manager_excel, head_manager_id, hr_manager_id, external_id_excel):
+    """
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :param client_user_id: Идентификатор созданного пользователя клиента
+    :param legal_entity_dict: Словарь, содержащий пары идентификатор-название юрлица
+    :param legal_entity_excel:
+    :param position_excel:
+    :param positions_dict:
+    :param department_excel:
+    :param root_department_id:
+    :param departments_dict:
+    :param head_manager_excel:
+    :param hr_manager_excel:
+    :param head_manager_id:
+    :param hr_manager_id:
+    :param external_id_excel:
+    :return:
+    """
     legal_entity_id = ''
     for id_name, name in legal_entity_dict.items():
         if (name[0] == legal_entity_excel) or (name[1] == legal_entity_excel):
