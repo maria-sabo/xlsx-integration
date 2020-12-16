@@ -8,7 +8,7 @@ def get_client_id_by_token(token):
     из ответа на запрос берет идентификатор текущего пользователя по заданному токену
 
     :param token: api-токен клиента
-    :return: Идентификатор клиента либо False (если что-то пошло не так, например, неедйствительный токен, то False)
+    :return: Идентификатор клиента, либо False (если что-то пошло не так, например, неедйствительный токен, то False)
     """
     current_user_response = requests.get('https://app-test1.hr-link.ru/api/v1/currentUser',
                                          headers={'User-Api-Token': token})
@@ -29,7 +29,7 @@ def create_client_user(token, client_id, data_for_creating_user):
     :param token: api-токен клиента
     :param client_id: Идентификатор клиента в сервисе
     :param data_for_creating_user: JSON-объект, содержащий данные для создания пользователя клиента
-    :return: Идентификатор созданного пользователя клиента либо False (если что-то пошло не так -- False)
+    :return: Идентификатор созданного пользователя клиента, либо False (если что-то пошло не так -- False)
     """
     create_user_response = requests.post('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/users',
                                          headers={'User-Api-Token': token},

@@ -1,5 +1,4 @@
 import json
-
 import requests
 
 from src.classes.add_employee import AddEmployee
@@ -9,7 +8,6 @@ from src.methods.get_for_employee import get_external_id, get_department, get_ro
 from src.methods.data_from_server import get_external_id_lst
 
 
-# готовим данные для создания employee
 def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict,
                               legal_entity_excel,
                               position_excel, positions_dict, department_excel, root_department_id,
@@ -17,23 +15,33 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
                               head_manager_excel,
                               hr_manager_excel, head_manager_id, hr_manager_id, external_id_excel):
     """
+    Функция готовит данные для создания сотрудника из пользователя клиента, собирает данные в словарь
 
     :param token: api-токен клиента
     :param client_id: Идентификатор клиента в сервисе
     :param client_user_id: Идентификатор созданного пользователя клиента
-    :param legal_entity_dict: Словарь, содержащий пары идентификатор-название юрлица
-    :param legal_entity_excel:
-    :param position_excel:
-    :param positions_dict:
-    :param department_excel:
-    :param root_department_id:
-    :param departments_dict:
-    :param head_manager_excel:
-    :param hr_manager_excel:
-    :param head_manager_id:
-    :param hr_manager_id:
-    :param external_id_excel:
-    :return:
+    :param legal_entity_dict: Словарь, содержащий пары идентификатор-[сокращенное название юрлица (если есть в excel),
+     название (если есть в excel)]
+    :param legal_entity_excel: Массив с названиями юрлиц из excel-таблицы
+    :param position_excel: Название должности, взятое из excel-таблицы
+    :param positions_dict: Словарь, содержащий идентификатор-название должности, уже записанных в сервисе
+    :param department_excel: Название отдела, взятое из excel-таблицы
+    :param root_department_id: Идентификатор корневого отдела
+    :param departments_dict: Словарь, содержащий идентификатор-название отдела, уже записанных в сервисе
+    :param head_manager_excel: Булевое значение, из excel-таблицы, является ли сотрудник руководителем
+    :param hr_manager_excel: Булевое значение, из excel-таблицы, является ли сотрудник кадровиком
+    :param head_manager_id: Идентификатор роли "Руководитель"
+    :param hr_manager_id: Идентификатор роли "Кадровик"
+    :param external_id_excel: Идентификатор внешней системы, взятый из excel
+    :return: Десериализованный JSON-объект (словарь), для использования в теле POST-запроса для создания сотрудника
+    из пользователя клиента
+    Возвращаемое значение имеет следующую структуру:
+        data = {"clientUserId": client_user_id,
+                "legalEntityId": legal_entity_id,
+                "departmentId": department_id,
+                "positionId": position_id,
+                "roleIds": [role_ids],
+                "externalId": external_id}
     """
     legal_entity_id = ''
     for id_name, name in legal_entity_dict.items():
@@ -46,12 +54,6 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     department_id = get_department(token, client_id, department_excel, root_department_id, departments_dict)
     role_ids = get_role_ids(head_manager_excel, hr_manager_excel, head_manager_id, hr_manager_id)
 
-    # data = {"clientUserId": client_user_id,
-    #         "legalEntityId": legal_entity_id,
-    #         "departmentId": department_id,
-    #         "positionId": position_id,
-    #         "roleIds": role_ids,
-    #         "externalId": external_id}
     add_employee = AddEmployee(client_user_id)
     add_employee.legalEntityId = legal_entity_id
     add_employee.departmentId = department_id
@@ -60,13 +62,18 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     add_employee.externalId = external_id
 
     data = json.loads(add_employee.toJSON())
-
     return data
 
 
-# создаем сотрудника
-# возвращается его employeeId
 def create_employee_from_client_user(token, client_id, data_for_creating_employee):
+    """
+    Функция посылает POST-запрос на создание сотрудника из пользователя клиента
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :param data_for_creating_employee: Словарь, содержащий данные для создания сотрудника
+    :return: Идентификатор созданного сотрудника
+    """
     create_employee_response = requests.post('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                                              headers={'User-Api-Token': token},
                                              json=data_for_creating_employee)
@@ -81,11 +88,15 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
         print('Сотрудник не создан.')
 
 
-# полное создание одного сотрудника:
-# создаем client_user
-# вызываем функцию, которая приготовит данные для создания employee
-# создаем employee
 def create_employee_full(data):
+    """
+    Функция выполняет функцию по созданию пользователя клиента
+    Если пользователь клиента успешно создан,
+    то выполняет функцию по приготовлению данных для создания сотрудника и создает сотрудника
+
+    :param data: Экземпляр класса DataCreateEmployee, содержащий все данные, нужные для создания пользователя клиента
+    и сотрудника
+    """
     data_for_creating_user = json.loads(data.user.toJSON())
     legal_entity_excel = data.employee.legalEntity
     position_excel = data.employee.position
@@ -115,8 +126,19 @@ def create_employee_full(data):
         print('Произошла ошибка при добавлении сотрудника.')
 
 
-# создаем employees
 def create_employees(data, data_users, df):
+    """
+    Если все переданные в excel-е юрлица существуют в сервисе,
+        то происходит цикл по всем строкам dataframe
+            Данные каждой строки записываются в экземпляры классов User, Employee
+                Если они корректны (не произошло ошибки валидации),
+                то они записываются в экземпляр класса DataCreateEmployee
+                И вызывается функция полного создания сотрудника
+
+    :param data: Экземпляр класса DataCreateEmployee, содержащий все данные, нужные для создания пользователя клиента
+    :param data_users: Экземпляр класса DataFromServerAboutUsers, содержащий данные, взятые с сервера
+    :param df: DataFrame, содержащий данные из excel-таблицы
+    """
     if data.checked_legal_entity_dict:
         for i, row in df.iterrows():
             print('creating employee #: ' + str(i))
@@ -125,6 +147,5 @@ def create_employees(data, data_users, df):
                 data.user = user
                 data.employee = employee
                 create_employee_full(data)
-
             else:
                 print('ERROR')
