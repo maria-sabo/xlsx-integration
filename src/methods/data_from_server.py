@@ -1,11 +1,16 @@
 import json
 import requests
-
-# получаем список всех снилсов в сервисе
 from src.classes.data_from_server_user import DataFromServerAboutUsers
 
 
 def lst_snils(token, client_id):
+    """
+    Функция посылает GET-запрос и возвращает список всех уже СНИЛСов у сотрудников клиента
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :return: Список всех записанных СНИЛСов, либо False (если запрос выполнился с ошибкой)
+    """
     snils_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                                   headers={'User-Api-Token': token})
     response_dict = json.loads(snils_response.text)
@@ -24,8 +29,16 @@ def lst_snils(token, client_id):
         return False
 
 
-# получаем словарь должностей ({'position_id': 'position_name'})
 def get_positions_dict(token, client_id):
+    """
+    Функция посылает GET-запрос и возвращает словарь типа {'position_id': 'position_name', ...}
+    с имеющимися у клиента должностями
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :return: Словарь существующих у клиента должностей типа {'position_id': 'position_name', ...},
+    либо False (если запрос выполнился с ошибкой)
+    """
     positions_response = requests.get(
         'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
         headers={'User-Api-Token': token})
@@ -41,9 +54,14 @@ def get_positions_dict(token, client_id):
         return False
 
 
-# получаем id корневого отдела (по идее лучше бы это выполнить 1 раз при запуске программы, а то при создании нового
-# отдела это вызывается каждый раз)
 def get_root_department_id(token, client_id):
+    """
+    Функция посылает GET-запрос и возвращает идентификатор корневого отдела у клиента
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :return: Идентификатор корневого отдела, либо False (если запрос выполнился с ошибкой)
+    """
     root_department_response = requests.get(
         'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/departments',
         headers={'User-Api-Token': token})
@@ -59,8 +77,14 @@ def get_root_department_id(token, client_id):
         return False
 
 
-# получаем словарь отделов ({'department_id': 'department_name'})
 def get_departments_dict(token, client_id):
+    """
+    Функция посылает GET-запрос и возращает словарь типа {'department_id': 'department_name', ...}
+    с существующими у клиента отделами
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :return: Словарь типа {'department_id': 'department_name', ...}, либо False (если запрос выполнился с ошибкой)
+    """
     departments_response = requests.get(
         'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/departments',
         headers={'User-Api-Token': token})
@@ -76,9 +100,14 @@ def get_departments_dict(token, client_id):
         return False
 
 
-# получаем словарь существующих ролей в сервисе
-# {'id': 'name'}
 def get_employee_role_ids(token):
+    """
+    Функция посылает GET-запрос и возвращает идентификатор роли "Руководитель", идентификатор роли "Кадровик"
+
+    :param token: api-токен клиента
+    :return: Идентификатор роли "Руководитель", идентификатор роли "Кадровик", либо False, False
+    (если при запросе произошла ошибка)
+    """
     departments_response = requests.get(
         'https://app-test1.hr-link.ru/api/v1/employeeRoles',
         headers={'User-Api-Token': token})
@@ -102,6 +131,14 @@ def get_employee_role_ids(token):
 
 # получаем список существующих external_id для переданного legal_entity_id
 def get_external_id_lst(token, client_id, legal_entity_id):
+    """
+    Функция посылает GET-запрос и возвращает список external_id, принадлежащих переданному юрлицу
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :param legal_entity_id: Идентификатор юрлица
+    :return: Список external_id, существующих у переланного юрлица
+    """
     employee_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                                      headers={'User-Api-Token': token})
     response_dict = json.loads(employee_response.text)
@@ -122,8 +159,16 @@ def get_external_id_lst(token, client_id, legal_entity_id):
     return []
 
 
-#
 def get_lst_about_users(token, client_id):
+    """
+    Функция посылает GET-запрос для получения информации о всех сотрудниках клиента
+    Все данные сотрудников (ИНН, СНИЛС, паспорт, email, телефон) записываются в поля(поле-список) экземпляра
+    класса DataFromServerAboutUsers
+
+    :param token: api-токен клиента
+    :param client_id: Идентификатор клиента в сервисе
+    :return: экземпляр класса DataFromServerAboutUsers
+    """
     response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                             headers={'User-Api-Token': token})
     response_dict = json.loads(response.text)
