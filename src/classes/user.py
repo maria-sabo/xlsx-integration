@@ -1,10 +1,20 @@
 from src.classes.json_encoder import JsonEncoder
 
 
-# класс для хранения данных пользователя
-# обязательные поля -- фамилия, имя
-# без них не создать экземпляр класса
 class User(JsonEncoder):
+    """
+    Экземпляр класса хранит данные для создания пользователя клиента
+    Поля имя, фамилия являются обязательными при создании экземпляра класса
+
+    lastName: (String) Фамилия
+    firstName: (String) Имя
+    patronymic: (String) Отчество
+    gender: (String) Пол
+    birthdate: (String) Дата рождения
+    phone: (String) Телефон
+    email: (String)
+    personalDocuments: (List) Список, содержащий документы пользователя (SNILS, INN, PASSPORT)
+    """
     lastName = ''
     firstName = ''
     patronymic = ''

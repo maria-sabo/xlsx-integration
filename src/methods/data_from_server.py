@@ -3,32 +3,6 @@ import requests
 from src.classes.data_from_server_user import DataFromServerAboutUsers
 
 
-def lst_snils(token, client_id):
-    """
-    Функция посылает GET-запрос и возвращает список всех уже СНИЛСов у сотрудников клиента
-
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
-    :return: Список всех записанных СНИЛСов, либо False (если запрос выполнился с ошибкой)
-    """
-    snils_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
-                                  headers={'User-Api-Token': token})
-    response_dict = json.loads(snils_response.text)
-    lst_person_snils = []
-
-    if response_dict.get('result'):
-        lst_employees = response_dict.get('employees')
-        for employee in lst_employees:
-            personal_documents = employee.get('personalDocuments')
-            for personal_document in personal_documents:
-                if personal_document['type'] == "SNILS":
-                    lst_person_snils.append(personal_document['number'])
-        return lst_person_snils
-    else:
-        print('Ошибка. Не удалось получить сотрудников и их СНИЛСы. ' + response_dict.get('errorMessage'))
-        return False
-
-
 def get_positions_dict(token, client_id):
     """
     Функция посылает GET-запрос и возвращает словарь типа {'position_id': 'position_name', ...}
@@ -129,7 +103,6 @@ def get_employee_role_ids(token):
         return False, False
 
 
-# получаем список существующих external_id для переданного legal_entity_id
 def get_external_id_lst(token, client_id, legal_entity_id):
     """
     Функция посылает GET-запрос и возвращает список external_id, принадлежащих переданному юрлицу

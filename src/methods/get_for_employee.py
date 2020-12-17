@@ -75,12 +75,22 @@ def get_role_ids(head_manager_excel, hr_manager_excel, head_manager_id, hr_manag
     return role_ids
 
 
-def get_external_id(external_id, external_id_lst):
-    if external_id in external_id_lst:
+def get_external_id(external_id_excel, external_id_lst):
+    """
+    Функция возвращает ID сотрудника во внешней системе
+    Если переданный идентификатор уже есть в списке идентификаторов юрлица, в котором сотрудник, то
+    возвращается None
+    Если идентификатора нет в системе, то возвращается переданный в excel-таблице
+
+    :param external_id_excel: Значение ячейки "ID сотрудника во внешней системе" excel-таблицы
+    :param external_id_lst: Список идентификаторов сотрудников во внешней системе для юрлица, в котором сотрудник
+    :return: Идентификатор сотрудника во внешней системе, либо None (если идентификатор уже есть в системе)
+    """
+    if external_id_excel in external_id_lst:
         print(
             'Такой ID сотрудника во внешней системе уже существует в данном юрлице. Сотрудник создастся без '
             'external_id.')
         return None
     else:
-        external_id_lst.append(external_id)
-        return external_id
+        external_id_lst.append(external_id_excel)
+        return external_id_excel

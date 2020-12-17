@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy
 
-from src.classes.data_from_server_user import DataFromServerAboutUsers
 from src.classes.user import User
 from src.classes.address import Address
 from src.classes.doc import Doc
@@ -13,28 +12,30 @@ from src.data_validate import gender_validate, date_validate, phone_validate, au
     passport_exists, email_exists, phone_exists, snils_exists, inn_exists
 
 
-# получение значения, прошедшего валидацию, из ячейки СНИЛС
-def get_snils(row):
-    return snils_validate(row['СНИЛС'])
-
-
-# если паспорт, СНИЛС, или ИНН не существуют на сервере, и
-# если email, phone не существуют на сервере, и
-# если значения из ячеек серия паспорта, номер паспорта, СНИЛС, ИНН, фамилия, имя непустые и прошли валидацию,
-# то данные одной строки проходят валидацию и записываюстся в объект класса User и в объект класса Employee
 def data2class(row, data_users):
+    """
+    Функция переводит данные из строки DataFrame в два объекта объект класса User, объект класса Employee)
+    Если паспорт, СНИЛС, ИНН, email, телефон прошли валиадцию и не существуют на сервере,
+    и обязательные ячейки excel-таблицы заполнены (Имя, Фамилия, СНИЛС, ИНН, Паспорт:Серия,
+    Паспорт:Номер, Руководитель, Кадровик), то данные записываются в объекты User, Employee
+
+    :param row: Строка DataFrame
+    :param data_users: Экземпляр класса DataFromServerAboutUsers
+    :return: Пара объектов (объект класса User, объект класса Employee), либо False, False
+    """
     passport_number = number_validate(row['Паспорт:Номер'])
     passport_serial_number = serial_number_validate(row['Паспорт:Серия'])
 
     snils = snils_validate(row['СНИЛС'])
     inn = inn_validate(row['ИНН ФЛ'])
-    # if not passport_number and not passport_serial_number and not snils and not inn):
-    #     return False, False
 
-    if passport_number and passport_serial_number and snils and inn and passport_exists(
+    phone = phone_validate(row['Номер телефона'])
+    email = email_validate(row['Электронная почта'])
+
+    if passport_number and passport_serial_number and snils and inn and (passport_exists(
             passport_serial_number + passport_number, data_users) or snils_exists(snils,
                                                                                   data_users) or inn_exists(
-        inn, data_users):
+        inn, data_users) or email_exists(email, data_users) or phone_exists(phone, data_users)):
         return False, False
 
     first_name = not_null_name_validate(row['Имя'])
@@ -42,12 +43,6 @@ def data2class(row, data_users):
 
     head_manager = head_manager_validate(row['Руководитель'])
     hr_manager = hr_manager_validate(row['Кадровый сотрудник'])
-
-    phone = phone_validate(row['Номер телефона'])
-    email = email_validate(row['Электронная почта'])
-
-    if email_exists(email, data_users) or phone_exists(phone, data_users):
-        return False, False
 
     if (passport_number and passport_serial_number and snils and inn) and (first_name and last_name) and (
             head_manager is not None) and (hr_manager is not None):
@@ -97,12 +92,16 @@ def data2class(row, data_users):
         return False, False
 
 
-# excel таблица переводится в df
-# удаляются три ненужные верхние строки (название, да/нет, пример)
-# удаляется ненужный первый столбец
-# убираются все переводы строк, значения ячеек триммируюстя справа и слева
-# все значения в ячейках приводятся к строковому типу
 def xlsx2df(excel_name):
+    """
+    Функция переводит excel-таблицу в DataFrame
+    Из DataFrame удаляются ненужные строки и столбцы (не относящиеся к данным)
+    Все значения ячеек приводятся к строковому типу
+    Удаляются переводы строки, значения ячеек триммируются справа и слева
+
+    :param excel_name: Имя excel-файла (путь)
+    :return: DataFrame, либо False (если что-то пошло не так при открытии excel-файла)
+    """
     try:
         df = pd.read_excel(excel_name, sheet_name=0)
         df.drop([0, 1, 2], inplace=True)
@@ -113,7 +112,6 @@ def xlsx2df(excel_name):
         df = df.astype(str)
         df = df.apply(lambda x: x.str.strip())
 
-        # df = df.astype(str)
         df.replace('nan', numpy.nan, inplace=True)
         return df
     except FileNotFoundError:

@@ -128,24 +128,22 @@ def create_employee_full(data):
 
 def create_employees(data, data_users, df):
     """
-    Если все переданные в excel-е юрлица существуют в сервисе,
-        то происходит цикл по всем строкам dataframe
-            Данные каждой строки записываются в экземпляры классов User, Employee
-                Если они корректны (не произошло ошибки валидации),
-                то они записываются в экземпляр класса DataCreateEmployee
-                И вызывается функция полного создания сотрудника
+    Происходит цикл по всем строкам dataframe
+        Данные каждой строки записываются в экземпляры классов User, Employee
+            Если они корректны (не произошло ошибки валидации),
+            то они записываются в экземпляр класса DataCreateEmployee
+            И вызывается функция полного создания сотрудника
 
     :param data: Экземпляр класса DataCreateEmployee, содержащий все данные, нужные для создания пользователя клиента
     :param data_users: Экземпляр класса DataFromServerAboutUsers, содержащий данные, взятые с сервера
     :param df: DataFrame, содержащий данные из excel-таблицы
     """
-    if data.checked_legal_entity_dict:
-        for i, row in df.iterrows():
-            print('creating employee #: ' + str(i))
-            user, employee = data2class(row, data_users)
-            if user and employee:
-                data.user = user
-                data.employee = employee
-                create_employee_full(data)
-            else:
-                print('ERROR')
+    for i, row in df.iterrows():
+        print('creating employee #: ' + str(i))
+        user, employee = data2class(row, data_users)
+        if user and employee:
+            data.user = user
+            data.employee = employee
+            create_employee_full(data)
+        else:
+            print('ERROR')
