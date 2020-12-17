@@ -26,6 +26,7 @@ def get_client_id_by_token(token):
 def create_client_user(token, client_id, data_for_creating_user):
     """
     Функция посылает POST-запрос на создание пользователя клиента
+
     :param token: api-токен клиента
     :param client_id: Идентификатор клиента в сервисе
     :param data_for_creating_user: JSON-объект, содержащий данные для создания пользователя клиента

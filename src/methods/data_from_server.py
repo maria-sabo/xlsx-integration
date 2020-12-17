@@ -55,6 +55,7 @@ def get_departments_dict(token, client_id):
     """
     Функция посылает GET-запрос и возращает словарь типа {'department_id': 'department_name', ...}
     с существующими у клиента отделами
+
     :param token: api-токен клиента
     :param client_id: Идентификатор клиента в сервисе
     :return: Словарь типа {'department_id': 'department_name', ...}, либо False (если запрос выполнился с ошибкой)
