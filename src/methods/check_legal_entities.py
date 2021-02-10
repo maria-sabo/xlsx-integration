@@ -1,6 +1,7 @@
 import json
 import requests
 
+from src.config import sub_domain
 
 def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     """
@@ -16,7 +17,7 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     :param excel_column_legal_entity: Массив строк из столбца "Юрлицо" excel-таблицы
     :return: Словарь {'id':['name', 'name'], 'id2': ['name2', 'name2'], ...}, либо False
     """
-    legal_entity_response = requests.get('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
+    legal_entity_response = requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
                                          headers={'User-Api-Token': token})
     response_dict = json.loads(legal_entity_response.text)
     legal_entity_dict = {}

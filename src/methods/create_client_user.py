@@ -1,6 +1,8 @@
 import json
 import requests
 
+from src.config import sub_domain
+
 
 def get_client_id_by_token(token):
     """
@@ -10,7 +12,7 @@ def get_client_id_by_token(token):
     :param token: api-токен клиента
     :return: Идентификатор клиента, либо False (если что-то пошло не так, например, неедйствительный токен, то False)
     """
-    current_user_response = requests.get('https://app-test1.hr-link.ru/api/v1/currentUser',
+    current_user_response = requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/currentUser',
                                          headers={'User-Api-Token': token})
     response_dict = json.loads(current_user_response.text)
     if response_dict.get('result'):
@@ -32,7 +34,7 @@ def create_client_user(token, client_id, data_for_creating_user):
     :param data_for_creating_user: JSON-объект, содержащий данные для создания пользователя клиента
     :return: Идентификатор созданного пользователя клиента, либо False (если что-то пошло не так -- False)
     """
-    create_user_response = requests.post('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/users',
+    create_user_response = requests.post('https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/users',
                                          headers={'User-Api-Token': token},
                                          json=data_for_creating_user)
     response_dict = json.loads(create_user_response.text)

@@ -4,6 +4,7 @@ import sys
 import requests
 
 from src.classes.data_for_creating_employee import DataCreateEmployee
+from src.config import sub_domain
 from src.convert import xlsx2df
 
 from src.methods.check_legal_entities import check_legal_entities_excel
@@ -37,7 +38,7 @@ def main():
     sys.argv[2]: Аргумент командной строки, строковое значение api-токена клиента
     :return:
     """
-    print('Welcome: ' + requests.get('https://app-test1.hr-link.ru/api/v1/version').text + '\n')
+    print('Welcome: ' + requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/version').text + '\n')
 
     if sys.argv.__len__() == ARGS_COUNT:
         data = DataCreateEmployee

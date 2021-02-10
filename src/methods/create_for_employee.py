@@ -2,6 +2,8 @@ import json
 import numpy
 import requests
 
+from src.config import sub_domain
+
 
 def create_position(token, client_id, position_excel):
     """
@@ -18,7 +20,7 @@ def create_position(token, client_id, position_excel):
         "name": position_excel
     }
     create_position_response = requests.post(
-        'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
+        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
         headers={'User-Api-Token': token},
         json=data_for_creating_position)
     response_dict = json.loads(create_position_response.text)
@@ -49,7 +51,7 @@ def create_department(token, client_id, department_excel, root_department_id):
         "name": department_excel
     }
     create_department_response = requests.post(
-        'https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/departments',
+        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
         headers={'User-Api-Token': token},
         json=data_for_creating_department)
     response_dict = json.loads(create_department_response.text)

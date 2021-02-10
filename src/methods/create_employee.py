@@ -6,6 +6,7 @@ from src.convert import data2class
 from src.methods.create_client_user import create_client_user
 from src.methods.get_for_employee import get_external_id, get_department, get_role_ids, get_position
 from src.methods.data_from_server import get_external_id_lst
+from src.config import sub_domain
 
 
 def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict,
@@ -74,9 +75,10 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
     :param data_for_creating_employee: Словарь, содержащий данные для создания сотрудника
     :return: Идентификатор созданного сотрудника
     """
-    create_employee_response = requests.post('https://app-test1.hr-link.ru/api/v1/clients/' + client_id + '/employees',
-                                             headers={'User-Api-Token': token},
-                                             json=data_for_creating_employee)
+    create_employee_response = requests.post(
+        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+        headers={'User-Api-Token': token},
+        json=data_for_creating_employee)
     response_dict = json.loads(create_employee_response.text)
 
     if response_dict.get('result'):
