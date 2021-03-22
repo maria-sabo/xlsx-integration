@@ -1,1 +1,1 @@
-sub_domain = 'app-test1'
+sub_domain = 'petrovich'

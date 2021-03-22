@@ -63,6 +63,7 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     add_employee.externalId = external_id
 
     data = json.loads(add_employee.toJSON())
+    print(data)
     return data
 
 
@@ -80,6 +81,7 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
         headers={'User-Api-Token': token},
         json=data_for_creating_employee)
     response_dict = json.loads(create_employee_response.text)
+    print(response_dict)
 
     if response_dict.get('result'):
         created_employee = response_dict.get('employee')
@@ -120,6 +122,7 @@ def create_employee_full(data):
                                                 head_manager_excel,
                                                 hr_manager_excel, data.head_manager_id, data.hr_manager_id,
                                                 external_id_excel)
+            print(data_em)
             create_employee_from_client_user(data.token, data.client_id, data_em)
             print('!!!')
         else:

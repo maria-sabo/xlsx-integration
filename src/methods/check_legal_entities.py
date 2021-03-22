@@ -3,6 +3,7 @@ import requests
 
 from src.config import sub_domain
 
+
 def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     """
     Проверяет существует ли каждое значение (название юрлица) из столбца "Юрлицо" excel-таблицы  в сервисе
@@ -17,8 +18,9 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     :param excel_column_legal_entity: Массив строк из столбца "Юрлицо" excel-таблицы
     :return: Словарь {'id':['name', 'name'], 'id2': ['name2', 'name2'], ...}, либо False
     """
-    legal_entity_response = requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
-                                         headers={'User-Api-Token': token})
+    legal_entity_response = requests.get(
+        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
+        headers={'User-Api-Token': token})
     response_dict = json.loads(legal_entity_response.text)
     legal_entity_dict = {}
     legal_entity_name_dict = {}
@@ -32,11 +34,12 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
             flag = False
             id_, name_ = '', ''
             for id_name, name_lst in legal_entity_name_dict.items():
-                if excel_legal_entity.lower() == name_lst[0].lower():
+
+                if str(excel_legal_entity).lower() == name_lst[0].lower():
                     flag = True
                     id_ = id_name
                     name_ = name_lst[0]
-                elif excel_legal_entity.lower() == name_lst[1].lower():
+                elif str(excel_legal_entity).lower() == str(name_lst[1]).lower():
                     flag = True
                     id_ = id_name
                     name_ = name_lst[1]

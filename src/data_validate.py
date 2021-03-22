@@ -57,7 +57,9 @@ def date_validate(date):
             date_format = datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
             return str(date_format)
         except:
-            print('Неккорентно введена дата. Дата не будет записана. Используйте формат dd.mm.yyyy.')
+            print(date)
+            print('Некорректно введена'
+                  ' дата. Дата не будет записана. Используйте формат dd.mm.yyyy.')
             return None
 
 
