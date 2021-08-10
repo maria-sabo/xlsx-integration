@@ -1,1 +1,1 @@
-sub_domain = 'petrovich'
+sub_domain = 'target'
