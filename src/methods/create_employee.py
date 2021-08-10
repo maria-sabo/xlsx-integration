@@ -9,12 +9,22 @@ from src.methods.data_from_server import get_external_id_lst
 from src.config import sub_domain
 
 
-def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dict,
-                              legal_entity_excel,
-                              position_excel, positions_dict, department_excel, root_department_id,
-                              departments_dict,
-                              head_manager_excel,
-                              hr_manager_excel, head_manager_id, hr_manager_id, external_id_excel):
+'''
+data.token, data.client_id, client_user_id,
+data.checked_legal_entity_dict,
+legal_entity_excel,
+position_excel, data.positions_dict, department_excel,
+data.root_department_id,
+data.departments_dict,
+head_manager_excel,
+hr_manager_excel, data.head_manager_id, data.hr_manager_id,
+external_id_excel
+'''
+
+
+def prepare_data_for_employee(data, client_user_id, legal_entity_excel,
+                              position_excel,  department_excel,
+                              head_manager_excel, hr_manager_excel, external_id_excel):
     """
     Функция готовит данные для создания сотрудника из пользователя клиента, собирает данные в словарь
 
@@ -45,15 +55,15 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
                 "externalId": external_id}
     """
     legal_entity_id = ''
-    for id_name, name in legal_entity_dict.items():
+    for id_name, name in data.checked_legal_entity_dict.items():
         if (name[0] == legal_entity_excel) or (name[1] == legal_entity_excel):
             legal_entity_id = id_name
 
-    external_id_lst = get_external_id_lst(token, client_id, legal_entity_id)
+    external_id_lst = get_external_id_lst(data.token, data.client_id, legal_entity_id)
     external_id = get_external_id(external_id_excel, external_id_lst)
-    position_id = get_position(token, client_id, position_excel, positions_dict)
-    department_id = get_department(token, client_id, department_excel, root_department_id, departments_dict)
-    role_ids = get_role_ids(head_manager_excel, hr_manager_excel, head_manager_id, hr_manager_id)
+    position_id = get_position(data.token, data.client_id, position_excel, data.positions_dict)
+    department_id = get_department(data.token, data.client_id, department_excel, data.root_department_id, data.departments_dict)
+    role_ids = get_role_ids(head_manager_excel, hr_manager_excel, data.head_manager_id, data.hr_manager_id)
 
     add_employee = AddEmployee(client_user_id)
     add_employee.legalEntityId = legal_entity_id
@@ -67,7 +77,7 @@ def prepare_data_for_employee(token, client_id, client_user_id, legal_entity_dic
     return data
 
 
-def create_employee_from_client_user(token, client_id, data_for_creating_employee):
+def create_employee_from_client_user(data, data_for_creating_employee):
     """
     Функция посылает POST-запрос на создание сотрудника из пользователя клиента
 
@@ -77,8 +87,8 @@ def create_employee_from_client_user(token, client_id, data_for_creating_employe
     :return: Идентификатор созданного сотрудника
     """
     create_employee_response = requests.post(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
-        headers={'User-Api-Token': token},
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + data.client_id + '/employees',
+        headers={'User-Api-Token': data.token},
         json=data_for_creating_employee)
     response_dict = json.loads(create_employee_response.text)
     print(response_dict)
@@ -111,19 +121,13 @@ def create_employee_full(data):
 
     external_id_excel = data.employee.externalId
     try:
-        client_user_id = create_client_user(data.token, data.client_id, data_for_creating_user)
+        client_user_id = create_client_user(data, data_for_creating_user)
         if client_user_id:
-            data_em = prepare_data_for_employee(data.token, data.client_id, client_user_id,
-                                                data.checked_legal_entity_dict,
-                                                legal_entity_excel,
-                                                position_excel, data.positions_dict, department_excel,
-                                                data.root_department_id,
-                                                data.departments_dict,
-                                                head_manager_excel,
-                                                hr_manager_excel, data.head_manager_id, data.hr_manager_id,
+            data_em = prepare_data_for_employee(data, client_user_id, legal_entity_excel,position_excel, 
+                                                department_excel,  head_manager_excel, hr_manager_excel,  
                                                 external_id_excel)
             print(data_em)
-            create_employee_from_client_user(data.token, data.client_id, data_em)
+            create_employee_from_client_user(data, data_em)
             print('!!!')
         else:
             print('...')

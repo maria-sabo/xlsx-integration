@@ -1,10 +1,8 @@
 import json
 import requests
 
-from src.config import sub_domain
 
-
-def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
+def check_legal_entities_excel(data):
     """
     Проверяет существует ли каждое значение (название юрлица) из столбца "Юрлицо" excel-таблицы  в сервисе
         Если все названия юрлиц есть в сервисе, то функция возвращает словарь пар идентификатор-список
@@ -19,8 +17,8 @@ def check_legal_entities_excel(token, client_id, excel_column_legal_entity):
     :return: Словарь {'id':['name', 'name'], 'id2': ['name2', 'name2'], ...}, либо False
     """
     legal_entity_response = requests.get(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/legalEntities',
-        headers={'User-Api-Token': token})
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + data.client_id + '/legalEntities',
+        headers={'User-Api-Token': data.token})
     response_dict = json.loads(legal_entity_response.text)
     legal_entity_dict = {}
     legal_entity_name_dict = {}

@@ -13,7 +13,7 @@ from src.methods.data_from_server import get_root_department_id, get_employee_ro
     get_positions_dict, get_lst_about_users
 from src.methods.create_employee import create_employees
 
-ARGS_COUNT = 3
+ARGS_COUNT = 4
 
 
 def main():
@@ -34,17 +34,20 @@ def main():
                     которая создает всех сотрудников
 
     sys.argv[0]: Аргумент командной строки, по умолчанию путь к скрипту main.py
-    sys.argv[1]: Аргумент командной строки, путь к excel-файлу, из которого будем загружать сотрудников
-    sys.argv[2]: Аргумент командной строки, строковое значение api-токена клиента
+    sys.argv[2]: Аргумент командной строки, имя поддомена
+    sys.argv[2]: Аргумент командной строки, путь к excel-файлу, из которого будем загружать сотрудников
+    sys.argv[3]: Аргумент командной строки, строковое значение api-токена клиента
     :return:
     """
-    print('Welcome: ' + requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/version').text + '\n')
 
     if sys.argv.__len__() == ARGS_COUNT:
         data = DataCreateEmployee
 
-        excel_name = sys.argv[1]
-        data.token = sys.argv[2]
+        data.tenant = sys.argv[1]
+        excel_name = sys.argv[2]
+        data.token = sys.argv[3]
+
+        print('Welcome: ' + requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/version').text + '\n')
 
         data.client_id = get_client_id_by_token(data.token)
 

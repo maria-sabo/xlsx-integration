@@ -2,7 +2,6 @@ import json
 import requests
 from src.classes.data_from_server_user import DataFromServerAboutUsers
 
-from src.config import sub_domain
 
 
 def get_positions_dict(token, client_id):
@@ -16,7 +15,7 @@ def get_positions_dict(token, client_id):
     либо False (если запрос выполнился с ошибкой)
     """
     positions_response = requests.get(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
         headers={'User-Api-Token': token})
     response_dict = json.loads(positions_response.text)
     positions_dict = {}
@@ -39,7 +38,7 @@ def get_root_department_id(token, client_id):
     :return: Идентификатор корневого отдела, либо False (если запрос выполнился с ошибкой)
     """
     root_department_response = requests.get(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
         headers={'User-Api-Token': token})
     response_dict = json.loads(root_department_response.text)
     if response_dict.get('result'):
@@ -63,7 +62,7 @@ def get_departments_dict(token, client_id):
     :return: Словарь типа {'department_id': 'department_name', ...}, либо False (если запрос выполнился с ошибкой)
     """
     departments_response = requests.get(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
         headers={'User-Api-Token': token})
     response_dict = json.loads(departments_response.text)
     departments_dict = {}
@@ -86,7 +85,7 @@ def get_employee_role_ids(token):
     (если при запросе произошла ошибка)
     """
     departments_response = requests.get(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/employeeRoles',
+        'https://' + data.tenant + '.hr-link.ru/api/v1/employeeRoles',
         headers={'User-Api-Token': token})
     response_dict = json.loads(departments_response.text)
     employee_roles_dict = {}
@@ -115,7 +114,7 @@ def get_external_id_lst(token, client_id, legal_entity_id):
     :param legal_entity_id: Идентификатор юрлица
     :return: Список external_id, существующих у переланного юрлица
     """
-    employee_response = requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+    employee_response = requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                                      headers={'User-Api-Token': token})
     response_dict = json.loads(employee_response.text)
     lst_external_id = []
@@ -145,7 +144,7 @@ def get_lst_about_users(token, client_id):
     :param client_id: Идентификатор клиента в сервисе
     :return: экземпляр класса DataFromServerAboutUsers
     """
-    response = requests.get('https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
+    response = requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + client_id + '/employees',
                             headers={'User-Api-Token': token})
     response_dict = json.loads(response.text)
     data_users = DataFromServerAboutUsers

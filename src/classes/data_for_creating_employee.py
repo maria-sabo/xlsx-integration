@@ -6,6 +6,7 @@ class DataCreateEmployee:
     """
     Экземпляр класса хранит данные для полного создания сотрудника
 
+
     token: (String) api-токен клиента
     client_id: (String) Идентификатор клиента
     user: (User) Данные, взятые из excel, для создания пользователя клиента
@@ -17,6 +18,7 @@ class DataCreateEmployee:
     hr_manager_id: (String) Идентификатор роли "Кадровик"
     employee: (Employee) Данные, взятые из excel, для создания сотрудника из пользователя клиента
     """
+    tenant = ''
     token = ''
     client_id = ''
 
