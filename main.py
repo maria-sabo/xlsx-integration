@@ -4,7 +4,6 @@ import sys
 import requests
 
 from src.classes.data_for_creating_employee import DataCreateEmployee
-from src.config import sub_domain
 from src.convert import xlsx2df
 
 from src.methods.check_legal_entities import check_legal_entities_excel
@@ -49,21 +48,20 @@ def main():
 
         print('Welcome: ' + requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/version').text + '\n')
 
-        data.client_id = get_client_id_by_token(data.token)
+        data.client_id = get_client_id_by_token(data)
 
         if data.client_id:
             df = xlsx2df(excel_name)
             if df is not False:
-                data.checked_legal_entity_dict = check_legal_entities_excel(data.token, data.client_id,
-                                                                            df['Юрлицо'].values)
+                data.checked_legal_entity_dict = check_legal_entities_excel(data, df['Юрлицо'].values)
                 if not data.checked_legal_entity_dict:
                     return False
                 else:
-                    data_users = get_lst_about_users(data.token, data.client_id)
-                    data.root_department_id = get_root_department_id(data.token, data.client_id)
-                    data.head_manager_id, data.hr_manager_id = get_employee_role_ids(data.token)
-                    data.positions_dict = get_positions_dict(data.token, data.client_id)
-                    data.departments_dict = get_departments_dict(data.token, data.client_id)
+                    data_users = get_lst_about_users(data)
+                    data.root_department_id = get_root_department_id(data)
+                    data.head_manager_id, data.hr_manager_id = get_employee_role_ids(data)
+                    data.positions_dict = get_positions_dict(data)
+                    data.departments_dict = get_departments_dict(data)
 
                     create_employees(data, data_users, df)
             else:

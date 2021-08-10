@@ -1,8 +1,7 @@
 import json
 import requests
 
-
-def check_legal_entities_excel(data):
+def check_legal_entities_excel(data, excel_column_legal_entity):
     """
     Проверяет существует ли каждое значение (название юрлица) из столбца "Юрлицо" excel-таблицы  в сервисе
         Если все названия юрлиц есть в сервисе, то функция возвращает словарь пар идентификатор-список

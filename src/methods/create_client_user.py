@@ -1,8 +1,6 @@
 import json
 import requests
 
-
-
 def get_client_id_by_token(data):#token):
     """
     Функция посылает GET-запрос на получение текущего пользователя,

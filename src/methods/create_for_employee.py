@@ -2,8 +2,6 @@ import json
 import numpy
 import requests
 
-
-
 def create_position(data, position_excel):
     """
     Функция посылает POST-запрос на создание должности

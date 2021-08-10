@@ -6,8 +6,6 @@ from src.convert import data2class
 from src.methods.create_client_user import create_client_user
 from src.methods.get_for_employee import get_external_id, get_department, get_role_ids, get_position
 from src.methods.data_from_server import get_external_id_lst
-from src.config import sub_domain
-
 
 '''
 data.token, data.client_id, client_user_id,
@@ -59,19 +57,17 @@ def prepare_data_for_employee(data, client_user_id, legal_entity_excel,
         if (name[0] == legal_entity_excel) or (name[1] == legal_entity_excel):
             legal_entity_id = id_name
 
-    external_id_lst = get_external_id_lst(data.token, data.client_id, legal_entity_id)
+    external_id_lst = get_external_id_lst(data, legal_entity_id)
     external_id = get_external_id(external_id_excel, external_id_lst)
-    position_id = get_position(data.token, data.client_id, position_excel, data.positions_dict)
-    department_id = get_department(data.token, data.client_id, department_excel, data.root_department_id, data.departments_dict)
-    role_ids = get_role_ids(head_manager_excel, hr_manager_excel, data.head_manager_id, data.hr_manager_id)
-
+    position_id = get_position(data, position_excel)
+    department_id = get_department(data, department_excel)
+    role_ids = get_role_ids(head_manager_excel, hr_manager_excel, data)
     add_employee = AddEmployee(client_user_id)
     add_employee.legalEntityId = legal_entity_id
     add_employee.departmentId = department_id
     add_employee.positionId = position_id
     add_employee.roleIds = role_ids
     add_employee.externalId = external_id
-
     data = json.loads(add_employee.toJSON())
     print(data)
     return data
@@ -123,9 +119,10 @@ def create_employee_full(data):
     try:
         client_user_id = create_client_user(data, data_for_creating_user)
         if client_user_id:
-            data_em = prepare_data_for_employee(data, client_user_id, legal_entity_excel,position_excel, 
-                                                department_excel,  head_manager_excel, hr_manager_excel,  
-                                                external_id_excel)
+            print('---')
+            data_em = prepare_data_for_employee(data, client_user_id, legal_entity_excel,
+                                                    position_excel, department_excel, 
+                                                    head_manager_excel, hr_manager_excel, external_id_excel)
             print(data_em)
             create_employee_from_client_user(data, data_em)
             print('!!!')
