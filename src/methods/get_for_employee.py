@@ -10,8 +10,7 @@ def get_position(data, position_excel):
         Если значение из ячейки excel-таблицы не было записано на сервере,
         то вызывается функция создания новой должности и возвращается новый созданный идентификатор
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
     :param position_excel: Название должности из excel-таблицы
     :param positions_dict: Словарь типа {'position_id': 'position_name', ...}, полученный с сервера
     :return: Идентификатор должности
@@ -35,10 +34,8 @@ def get_department(data, department_excel):
         Если значение из ячейки excel-таблицы не было записано на сервере,
         то вызывается функция создания нового отдела и возвращается новый созданный идентификатор
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
     :param department_excel: Название таблицы из excel-таблицы
-    :param root_department_id: Идентификатор корневого отдела у клиента
     :param departments_dict: Словарь типа {'department_id': 'department_name', ...}, полученный с сервера
     :return: Идентификатор отдела
     """
@@ -58,10 +55,11 @@ def get_role_ids(head_manager_excel, hr_manager_excel, data):
     Функция возвращает список идентификаторов ролей, на основе переданных 'да/нет' в excel-таблице
     (да - передаем идентификатор, нет - не передаем)
 
+    :param data: Экземпляр класса DataCreateEmployee
     :param head_manager_excel: Значение из ячейки excel (Во время валидации переведено в True/False)
     :param hr_manager_excel: Значение из ячейки excel (Во время валидации переведено в True/False)
-    :param head_manager_id: Идентификатор роли "Руководитель" с сервера
-    :param hr_manager_id: Идентификатор роли "Кадровик" с сервера
+    :data.head_manager_id: Идентификатор роли "Руководитель" с сервера
+    :data.hr_manager_id: Идентификатор роли "Кадровик" с сервера
     :return: Список идентификаторов ролей
     """
     role_ids = []

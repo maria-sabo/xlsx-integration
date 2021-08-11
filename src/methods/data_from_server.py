@@ -7,8 +7,10 @@ def get_positions_dict(data):
     Функция посылает GET-запрос и возвращает словарь типа {'position_id': 'position_name', ...}
     с имеющимися у клиента должностями
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :return: Словарь существующих у клиента должностей типа {'position_id': 'position_name', ...},
     либо False (если запрос выполнился с ошибкой)
     """
@@ -31,8 +33,10 @@ def get_root_department_id(data):
     """
     Функция посылает GET-запрос и возвращает идентификатор корневого отдела у клиента
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :return: Идентификатор корневого отдела, либо False (если запрос выполнился с ошибкой)
     """
     root_department_response = requests.get(
@@ -55,8 +59,10 @@ def get_departments_dict(data):
     Функция посылает GET-запрос и возращает словарь типа {'department_id': 'department_name', ...}
     с существующими у клиента отделами
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :return: Словарь типа {'department_id': 'department_name', ...}, либо False (если запрос выполнился с ошибкой)
     """
     departments_response = requests.get(
@@ -78,7 +84,9 @@ def get_employee_role_ids(data):
     """
     Функция посылает GET-запрос и возвращает идентификатор роли "Руководитель", идентификатор роли "Кадровик"
 
-    :param token: api-токен клиента
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
     :return: Идентификатор роли "Руководитель", идентификатор роли "Кадровик", либо False, False
     (если при запросе произошла ошибка)
     """
@@ -107,8 +115,10 @@ def get_external_id_lst(data, legal_entity_id):
     """
     Функция посылает GET-запрос и возвращает список external_id, принадлежащих переданному юрлицу
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :param legal_entity_id: Идентификатор юрлица
     :return: Список external_id, существующих у переланного юрлица
     """
@@ -138,8 +148,10 @@ def get_lst_about_users(data):
     Все данные сотрудников (ИНН, СНИЛС, паспорт, email, телефон) записываются в поля(поле-список) экземпляра
     класса DataFromServerAboutUsers
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataFromServer
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :return: экземпляр класса DataFromServerAboutUsers
     """
     response = requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + data.client_id + '/employees',

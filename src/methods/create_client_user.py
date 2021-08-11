@@ -1,12 +1,14 @@
 import json
 import requests
 
-def get_client_id_by_token(data):#token):
+def get_client_id_by_token(data):
     """
     Функция посылает GET-запрос на получение текущего пользователя,
     из ответа на запрос берет идентификатор текущего пользователя по заданному токену
 
-    :param token: api-токен клиента
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
     :return: Идентификатор клиента, либо False (если что-то пошло не так, например, неедйствительный токен, то False)
     """
     current_user_response = requests.get('https://' + data.tenant + '.hr-link.ru/api/v1/currentUser',
@@ -26,8 +28,10 @@ def create_client_user(data, data_for_creating_user):
     """
     Функция посылает POST-запрос на создание пользователя клиента
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :param data_for_creating_user: JSON-объект, содержащий данные для создания пользователя клиента
     :return: Идентификатор созданного пользователя клиента, либо False (если что-то пошло не так -- False)
     """

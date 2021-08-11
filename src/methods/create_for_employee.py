@@ -6,9 +6,11 @@ def create_position(data, position_excel):
     """
     Функция посылает POST-запрос на создание должности
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
-    :param position_excel: Название должности из excel
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
+        :data.position_excel: Название должности из excel
     :return: Идентификатор созданной должности
     """
     if type(position_excel) is float and numpy.isnan(position_excel):
@@ -34,10 +36,12 @@ def create_department(data, department_excel):
     """
     Функцция посылает POST-запрос на создание отдела
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
+        :data.root_department_id: Идентификатор корневого отдела
     :param department_excel: Название отдела из excel
-    :param root_department_id: Идентификатор корневого отдела
     :return: Идентификатор созданного отдела
     """
     if type(department_excel) is float and numpy.isnan(department_excel):

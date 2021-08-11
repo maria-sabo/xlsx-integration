@@ -10,8 +10,10 @@ def check_legal_entities_excel(data, excel_column_legal_entity):
         либо только 'Сокращенное название', либо 'Название' и 'Сокращенное название' )
         Если хотя бы одного названия юрлица из столбца "Юрлицо" excel-таблицы нет в сервисе, то возвращает False
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :param excel_column_legal_entity: Массив строк из столбца "Юрлицо" excel-таблицы
     :return: Словарь {'id':['name', 'name'], 'id2': ['name2', 'name2'], ...}, либо False
     """

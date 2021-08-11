@@ -26,21 +26,16 @@ def prepare_data_for_employee(data, client_user_id, legal_entity_excel,
     """
     Функция готовит данные для создания сотрудника из пользователя клиента, собирает данные в словарь
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
     :param client_user_id: Идентификатор созданного пользователя клиента
-    :param legal_entity_dict: Словарь, содержащий пары идентификатор-[сокращенное название юрлица (если есть в excel),
-     название (если есть в excel)]
+    :param data: структура данных DataCreateEmployee
+        :data.checked_legal_entity_dict: Словарь, содержащий пары идентификатор-[
+            сокращенное название юрлица (если есть в excel),название (если есть в excel)]
+        :data.positions_dict: Словарь, содержащий идентификатор-название должности, уже записанных в сервисе
     :param legal_entity_excel: Массив с названиями юрлиц из excel-таблицы
     :param position_excel: Название должности, взятое из excel-таблицы
-    :param positions_dict: Словарь, содержащий идентификатор-название должности, уже записанных в сервисе
     :param department_excel: Название отдела, взятое из excel-таблицы
-    :param root_department_id: Идентификатор корневого отдела
-    :param departments_dict: Словарь, содержащий идентификатор-название отдела, уже записанных в сервисе
     :param head_manager_excel: Булевое значение, из excel-таблицы, является ли сотрудник руководителем
     :param hr_manager_excel: Булевое значение, из excel-таблицы, является ли сотрудник кадровиком
-    :param head_manager_id: Идентификатор роли "Руководитель"
-    :param hr_manager_id: Идентификатор роли "Кадровик"
     :param external_id_excel: Идентификатор внешней системы, взятый из excel
     :return: Десериализованный JSON-объект (словарь), для использования в теле POST-запроса для создания сотрудника
     из пользователя клиента
@@ -77,8 +72,10 @@ def create_employee_from_client_user(data, data_for_creating_employee):
     """
     Функция посылает POST-запрос на создание сотрудника из пользователя клиента
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: структура данных DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
     :param data_for_creating_employee: Словарь, содержащий данные для создания сотрудника
     :return: Идентификатор созданного сотрудника
     """
