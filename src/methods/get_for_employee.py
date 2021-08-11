@@ -48,7 +48,7 @@ def get_department(data, department_excel):
         else:
             if department_name.lower() == department_excel.lower():
                 return department_id
-    department_id = create_department(data.token, data.client_id, department_excel, data.root_department_id)
+    department_id = create_department(data, department_excel)
     data.departments_dict[department_id] = department_excel
     return department_id
 
