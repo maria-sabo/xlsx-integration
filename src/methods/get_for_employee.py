@@ -22,7 +22,7 @@ def get_position(data, position_excel):
         else:
             if position_name.lower() == position_excel.lower():
                 return position_id
-    position_id = create_position(data.token, data.client_id, position_excel)
+    position_id = create_position(data, position_excel)
     data.positions_dict[position_id] = position_excel
     return position_id
 
