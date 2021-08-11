@@ -2,16 +2,15 @@ import json
 import numpy
 import requests
 
-from src.config import sub_domain
-
-
-def create_position(token, client_id, position_excel):
+def create_position(data, position_excel):
     """
     Функция посылает POST-запрос на создание должности
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
-    :param position_excel: Название должности из excel
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
+        :data.position_excel: Название должности из excel
     :return: Идентификатор созданной должности
     """
     if type(position_excel) is float and numpy.isnan(position_excel):
@@ -20,8 +19,8 @@ def create_position(token, client_id, position_excel):
         "name": position_excel
     }
     create_position_response = requests.post(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/employeePositions',
-        headers={'User-Api-Token': token},
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + data.client_id + '/employeePositions',
+        headers={'User-Api-Token': data.token},
         json=data_for_creating_position)
     response_dict = json.loads(create_position_response.text)
     if response_dict.get('result'):
@@ -33,26 +32,28 @@ def create_position(token, client_id, position_excel):
         print('Должность не добавлена. Произошла ошибка: ' + response_dict.get('errorMessage'))
 
 
-def create_department(token, client_id, department_excel, root_department_id):
+def create_department(data, department_excel):
     """
     Функцция посылает POST-запрос на создание отдела
 
-    :param token: api-токен клиента
-    :param client_id: Идентификатор клиента в сервисе
+    :param data: Экземпляр класса DataCreateEmployee
+        :data.tenant: Название поддомена клиента
+        :data.token: api-токен клиента
+        :data.client_id: Идентификатор клиента в сервисе
+        :data.root_department_id: Идентификатор корневого отдела
     :param department_excel: Название отдела из excel
-    :param root_department_id: Идентификатор корневого отдела
     :return: Идентификатор созданного отдела
     """
     if type(department_excel) is float and numpy.isnan(department_excel):
         return ""
 
     data_for_creating_department = {
-        "parentDepartmentId": root_department_id,
+        "parentDepartmentId": data.root_department_id,
         "name": department_excel
     }
     create_department_response = requests.post(
-        'https://' + sub_domain + '.hr-link.ru/api/v1/clients/' + client_id + '/departments',
-        headers={'User-Api-Token': token},
+        'https://' + data.tenant + '.hr-link.ru/api/v1/clients/' + data.client_id + '/departments',
+        headers={'User-Api-Token': data.token},
         json=data_for_creating_department)
     response_dict = json.loads(create_department_response.text)
 
